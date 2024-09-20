@@ -1,3 +1,5 @@
+import { Button, Form, Input } from "@ant-design/react-native";
+import { useForm } from "@ant-design/react-native/lib/form/Form";
 import { useSignIn } from "@clerk/clerk-expo";
 import { Link } from "expo-router";
 import React, { useState } from "react";
@@ -5,13 +7,15 @@ import {
   View,
   StyleSheet,
   TextInput,
-  Button,
+  // Button,
   Pressable,
   Text,
   Alert,
   TouchableOpacity,
 } from "react-native";
 import Spinner from "react-native-loading-spinner-overlay";
+import { getItemsService } from "../../utils/services";
+import lists from "../../utils/lists";
 
 const Login = () => {
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -19,31 +23,57 @@ const Login = () => {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [form] = useForm();
 
-  const onSignInPress = async () => {
-    if (!isLoaded) {
-      return;
-    }
-    setLoading(true);
-    try {
-      const completeSignIn = await signIn.create({
-        identifier: emailAddress,
-        password,
-      });
+  // const onSignInPress = async () => {
+  //   if (!isLoaded) {
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   try {
+  //     const completeSignIn = await signIn.create({
+  //       identifier: emailAddress,
+  //       password,
+  //     });
 
-      // This indicates the user is signed in
-      await setActive({ session: completeSignIn.createdSessionId });
-    } catch (err: any) {
-      alert(err.errors[0].message);
-    } finally {
-      setLoading(false);
-    }
+  //     // This indicates the user is signed in
+  //     await setActive({ session: completeSignIn.createdSessionId });
+  //   } catch (err: any) {
+  //     alert(err.errors[0].message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const onSubmit = async () => {
+    const users = await getItemsService(lists.Users).then((res) => res.value);
+    setUsers(users);
   };
 
   return (
     <View style={styles.container}>
-      <Spinner visible={loading} />
+      {users.length > 0 &&
+        users.map((user) => <Text key={user.Id}>{user.FirstName}</Text>)}
+      <Form
+        form={form}
+        layout="horizontal"
+        onFinish={(values) => alert("values")}
+      >
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[{ required: true, message: "Please input your email!" }]}
+        >
+          <Input autoCapitalize="none" placeholder="aaa" />
+        </Form.Item>
 
+        <Button type="primary" onPress={onSubmit}>
+          Call API
+        </Button>
+      </Form>
+      {/* <Spinner visible={loading} />
+      <Text className="text-red-500">Đăng nhập</Text>
       <View style={{ display: "flex", gap: "12px" }}>
         <View>
           <Text style={{ fontSize: "18px", fontWeight: 700 }}>Email</Text>
@@ -99,7 +129,7 @@ const Login = () => {
             <Text style={{ color: "blue" }}>Quên mật khẩu?</Text>
           </Pressable>
         </Link>
-      </View>
+      </View> */}
     </View>
   );
 };
