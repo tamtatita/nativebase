@@ -1,37 +1,13 @@
 import React from "react";
-import { Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
+import { Text } from "react-native";
 
-const PublicLayout = () => {
+const HomeLayout = () => {
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: "#6c47ff",
-        },
-        headerTintColor: "#fff",
-        headerBackTitle: "Back",
-      }}
-    >
-      <Stack.Screen
-        name="login"
-        options={{
-          headerTitle: "Clerk Auth App",
-        }}
-      ></Stack.Screen>
-      <Stack.Screen
-        name="register"
-        options={{
-          headerShown: false,
-        }}
-      ></Stack.Screen>
-      <Stack.Screen
-        name="reset"
-        options={{
-          headerShown: false,
-        }}
-      ></Stack.Screen>
-    </Stack>
+    <>
+      <Slot />
+    </>
   );
 };
 
-export default PublicLayout;
+export default HomeLayout;

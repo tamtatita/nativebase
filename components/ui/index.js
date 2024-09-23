@@ -1,3 +1,5 @@
 import Button from "./Button";
 import IconButton from "./IconButton";
-export { Button, IconButton };
+import InputLabel from "./InputLabel";
+import Toast from "./Toast";
+export { Button, IconButton, Toast, InputLabel };

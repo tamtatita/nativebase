@@ -1,25 +1,60 @@
-import { Slot, useRouter, useSegments } from "expo-router";
-import { useEffect } from "react";
+import { Slot, Stack, useRouter, useSegments } from "expo-router";
+import { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { Text } from "react-native";
-
-const InitialLayout = () => {
-  const segments = useSegments();
-  const router = useRouter();
-
-  useEffect(() => {
-    // Kiểm tra điều kiện và thực hiện điều hướng tự động
-    // Ví dụ: Nếu người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
-    if (true) {
-      router.replace("/register");
-    }
-  }, [router]);
-
-  return <Slot />;
-};
+import * as SplashScreen from "expo-splash-screen";
+import { useFonts } from "expo-font";
+import useAuth from "@/hooks/useAuth";
+import { ToastProvider } from "@/hooks/useToast";
+SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
-  return <InitialLayout />;
+  const segments = useSegments();
+  const router = useRouter();
+  const { loading, user } = useAuth();
+  const [fontsLoaded] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  // Hàm điều hướng khi đã xác thực người dùng hoặc chưa
+  // console.log(user?.displayName, "000");
+  useEffect(() => {
+    if (loading === false && fontsLoaded) {
+      // Điều hướng dựa trên trạng thái xác thực của người dùng
+      if (user) {
+        if (user?.displayName === undefined || user?.displayName === null) {
+          router.replace("/(public)/complete");
+        } else {
+          router.replace("/(tabs)");
+        }
+      } else {
+        router.replace("/(public)/login");
+      }
+    }
+  }, [loading, fontsLoaded, user]);
+
+  // Hiển thị hoặc ẩn SplashScreen khi fonts được tải
+  useEffect(() => {
+    if (fontsLoaded && loading === false) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, loading]);
+
+  // Nếu fonts hoặc trạng thái xác thực chưa load thì trả về null
+  if (!fontsLoaded || loading === true) {
+    return null;
+  }
+
+  return (
+    <ToastProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="(public)" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+    </ToastProvider>
+  );
 };
 
 export default RootLayout;

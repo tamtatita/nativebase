@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Colors } from "../../constants/Colors";
-const Button = ({ title, type, onPress, className }) => {
+const Button = ({ title, type, onPress, classNames }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -10,7 +10,7 @@ const Button = ({ title, type, onPress, className }) => {
         type === "full" && styles.full,
         type === "link" && styles.link,
       ]}
-      className={className}
+      className={classNames}
     >
       <Text style={[styles.text, type === "link" && styles.textLink]}>
         {title}

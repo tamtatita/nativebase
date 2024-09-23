@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 const Index = () => {
   return (
     <View>
+      <SafeAreaView />
       <Text>Index</Text>
     </View>
   );
