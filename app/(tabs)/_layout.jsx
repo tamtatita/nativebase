@@ -22,18 +22,18 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.primary, // Màu khi tab được active
         tabBarInactiveTintColor: "#B0B0B0", // Màu khi tab không được active
         headerShown: false, // Ẩn header
-        tabBarStyle: {
-          // Tùy chỉnh phong cách của tabBar
-          position: "absolute",
-          // bottom: 20, // Nâng cao tab bar lên
-          height: 100, // Chiều cao tab bar
-          borderTopWidth: 1, // Bỏ border top
-          backgroundColor: "white", // Màu nền của tab bar
-        },
-        tabBarLabelStyle: {
-          // Tùy chỉnh phong cách text của tab
-          paddingBottom: 5, // Khoảng cách giữa text và icon
-        },
+        // tabBarStyle: {
+        //   // Tùy chỉnh phong cách của tabBar
+        //   position: "absolute",
+        //   // bottom: 20, // Nâng cao tab bar lên
+        //   height: 100, // Chiều cao tab bar
+        //   borderTopWidth: 1, // Bỏ border top
+        //   backgroundColor: "white", // Màu nền của tab bar
+        // },
+        // tabBarLabelStyle: {
+        //   // Tùy chỉnh phong cách text của tab
+        //   paddingBottom: 5, // Khoảng cách giữa text và icon
+        // },
       }}
     >
       <Tabs.Screen
