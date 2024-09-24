@@ -7,7 +7,7 @@ import { useFonts } from "expo-font";
 import useAuth from "@/hooks/useAuth";
 import { ToastProvider } from "@/hooks/useToast";
 SplashScreen.preventAutoHideAsync();
-
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
@@ -22,11 +22,11 @@ const RootLayout = () => {
     if (loading === false && fontsLoaded) {
       // Điều hướng dựa trên trạng thái xác thực của người dùng
       if (user) {
-        if (user?.displayName === undefined || user?.displayName === null) {
-          router.replace("/(public)/complete");
-        } else {
-          router.replace("/(tabs)");
-        }
+        // if (user?.displayName === undefined || user?.displayName === null) {
+        //   router.replace("/(public)/complete");
+        // } else {
+        router.replace("/(tabs)");
+        // }
       } else {
         router.replace("/(public)/login");
       }
@@ -46,14 +46,17 @@ const RootLayout = () => {
   }
 
   return (
-    <ToastProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-        <Stack.Screen name="(public)" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-      </Stack>
-    </ToastProvider>
+    <GestureHandlerRootView>
+      <ToastProvider>
+        <Stack>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+          <Stack.Screen name="(public)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+        </Stack>
+      </ToastProvider>
+    </GestureHandlerRootView>
   );
 };
 

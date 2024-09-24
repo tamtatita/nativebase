@@ -46,6 +46,7 @@ const Login = () => {
         values?.email,
         values?.password
       );
+      console.log(user, "user");
 
       if (user) {
         showToast({
