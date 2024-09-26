@@ -124,6 +124,7 @@ const Index = () => {
           </View>
           <View className="flex items-center justify-center">
             <IconButton
+              onPress={() => router.push("/notification")}
               shape={"roundedSquare"}
               size={"small"}
               classNames={"rounded-xl"}

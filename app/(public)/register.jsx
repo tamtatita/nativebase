@@ -10,7 +10,7 @@ import { useState } from "react";
 import { router, Stack } from "expo-router";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { TitleHeader } from "@/components/global";
+import { TitleHeader } from "@/components";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Button, IconButton, InputLabel } from "@/components/ui";

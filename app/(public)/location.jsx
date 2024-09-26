@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { TitleHeader } from "@/components/global";
+import { TitleHeader } from "@/components";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Colors } from "@/constants/Colors";
 import { Entypo } from "@expo/vector-icons";

@@ -125,7 +125,7 @@ const Search = () => {
       <View className="mt-4">
         <Text className="font-bold text-lg text-slate-700">Recent View</Text>
 
-        <View>
+        <View className="mt-4">
           <FlashList
             data={recentView}
             renderItem={({ item }) => <JobItem data={item} type="full" />}

@@ -12,7 +12,7 @@ import Spinner from "react-native-loading-spinner-overlay";
 import { useState } from "react";
 import { router, Stack } from "expo-router";
 import { Formik } from "formik";
-import { TitleHeader } from "@/components/global";
+import { TitleHeader } from "@/components";
 import Entypo from "@expo/vector-icons/Entypo";
 import { Button, IconButton } from "../../components/ui";
 import { Colors } from "@/constants/Colors";
