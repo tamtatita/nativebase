@@ -124,6 +124,7 @@ const Index = () => {
           </View>
           <View className="flex items-center justify-center">
             <IconButton
+              onPress={() => router.push("/notification")}
               shape={"roundedSquare"}
               size={"small"}
               classNames={"rounded-xl"}
@@ -247,16 +248,13 @@ const Index = () => {
   }, []);
   return (
     <FlashList
-      // style={{ height: height - 100 }}
-      // contentContainerStyle={{ height: height }}
-      // scrollEnabled={true}
       showsVerticalScrollIndicator={true}
       estimatedItemSize={6}
       ListHeaderComponent={() => (
         <>
           <RenderSearchTop />
 
-          <View className=" flex ">
+          <View className="">
             <RenderSuggestedJobs />
 
             <RenderRecentJobs />

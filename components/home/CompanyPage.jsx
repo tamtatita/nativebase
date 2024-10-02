@@ -1,8 +1,9 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { IconButton } from "../ui";
+import { Button, IconButton } from "../ui";
 import { Colors } from "@/constants/Colors";
+import { router } from "expo-router";
 const CompanyPage = ({ data }) => {
   return (
     <View className="bg-white p-5">
@@ -12,6 +13,13 @@ const CompanyPage = ({ data }) => {
       <Text className="text-gray-500 tracking-wider">
         {data?.about?.aboutJob}
       </Text>
+
+      <TouchableOpacity
+        onPress={() => router.push(`(auth)/company/${data?.id}`)}
+        className="bg-primary p-3 rounded-md my-3"
+      >
+        <Text className="text-white font-bold text-center">Xem thêm</Text>
+      </TouchableOpacity>
 
       {/* Contact */}
       <Text className="font-semibold text-[16px] my-2">Company Contact</Text>

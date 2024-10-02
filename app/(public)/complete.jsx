@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import React from "react";
-import { TitleHeader } from "../../components/global";
+import { TitleHeader } from "@/components";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Colors } from "../../constants/Colors";
 import { Button, IconButton, InputLabel } from "../../components/ui";
