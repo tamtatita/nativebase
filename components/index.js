@@ -7,7 +7,13 @@ import ReviewPage from "./home/ReviewPage";
 import Loading from "./global/Loading";
 import TitleHeader from "./global/TitleHeader";
 import ChatItem from "./chat/ChatItem";
+import OpenJobs from "./company/OpenJobs";
+import People from "./company/People";
+import Gallery from "./company/Gallery";
 export {
+  Gallery,
+  People,
+  OpenJobs,
   ChatItem,
   JobItem,
   CategoryItem,

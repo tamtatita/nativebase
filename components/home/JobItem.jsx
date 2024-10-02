@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useCallback } from "react";
 import { width } from "@/lib/InfoDevice";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Colors } from "@/constants/Colors";
@@ -8,6 +8,38 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { formatCurrencyRange } from "@/utils";
 import { Link, router } from "expo-router";
 const JobItem = ({ data, type }) => {
+  const RenderStatus = useCallback(() => {
+    let color;
+    let bg;
+    switch (data?.status) {
+      case "sent":
+        bg = "#e0e7ff";
+        color = "#4f46e5";
+        break;
+      case "accepted":
+        bg = "#d1fae5";
+        color = "#059669";
+        break;
+      case "rejected":
+        bg = "#fee2e2";
+        color = "#dc2626";
+        break;
+      case "pending":
+        bg = "#ffedd5";
+        color = "#f97316";
+        break;
+      default:
+        break;
+    }
+
+    return (
+      <View style={{ backgroundColor: bg }} className="px-3 py-2 rounded-md">
+        <Text className="capitalize font-semibold" style={{ color: color }}>
+          {data?.status}
+        </Text>
+      </View>
+    );
+  }, [data]);
   return (
     <View
       style={{
@@ -39,20 +71,24 @@ const JobItem = ({ data, type }) => {
               </Text>
             </View>
           </View>
-          <View>
-            <IconButton
-              size={"small"}
-              shape="circle"
-              color="transparent"
-              icon={
-                <Ionicons
-                  name="bookmark-outline"
-                  size={24}
-                  color={Colors.primary}
-                />
-              }
-            />
-          </View>
+          {type !== "applied" ? (
+            <View>
+              <IconButton
+                size={"small"}
+                shape="circle"
+                color="transparent"
+                icon={
+                  <Ionicons
+                    name="bookmark-outline"
+                    size={24}
+                    color={Colors.primary}
+                  />
+                }
+              />
+            </View>
+          ) : (
+            <RenderStatus />
+          )}
         </View>
       </TouchableOpacity>
 
@@ -82,50 +118,54 @@ const JobItem = ({ data, type }) => {
         )}
       </View>
 
-      {/* Divider */}
-      <View className="border-b my-4 border-gray-300 mt-3"></View>
-      {/* Applicants view và mức lương */}
-      <View className="flex flex-row items-center justify-between">
-        <View>
-          <View className="flex flex-row -space-x-1 overflow-hidden">
-            <Image
-              className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-              src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
-            />
-            <Image
-              className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-              src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
-            />
-            <Image
-              className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
-              alt=""
-            />
-            <Image
-              className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
-            />
-          </View>
+      {type !== "applied" && (
+        <>
+          {/* Divider */}
+          <View className="border-b my-4 border-gray-300 mt-3"></View>
+          {/* Applicants view và mức lương */}
+          <View className="flex flex-row items-center justify-between">
+            <View>
+              <View className="flex flex-row -space-x-1 overflow-hidden">
+                <Image
+                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
+                  src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt=""
+                />
+                <Image
+                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
+                  src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt=""
+                />
+                <Image
+                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
+                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
+                  alt=""
+                />
+                <Image
+                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt=""
+                />
+              </View>
 
-          <Text className="text-slate-500 font-semibold mt-2">
-            {data?.applicantsView} Applicants
-          </Text>
-        </View>
+              <Text className="text-slate-500 font-semibold mt-2">
+                {data?.applicantsView} Applicants
+              </Text>
+            </View>
 
-        <View>
-          <View className="mt-2 flex flex-row items-center">
-            <Text className="text-primary font-bold text-lg">
-              {formatCurrencyRange(data?.salary)}
-            </Text>
-            <Text className="text-sm font-semibold text-slate-500 ml-2">
-              /Month
-            </Text>
+            <View>
+              <View className="mt-2 flex flex-row items-center">
+                <Text className="text-primary font-bold text-lg">
+                  {formatCurrencyRange(data?.salary)}
+                </Text>
+                <Text className="text-sm font-semibold text-slate-500 ml-2">
+                  /Month
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
+        </>
+      )}
     </View>
   );
 };

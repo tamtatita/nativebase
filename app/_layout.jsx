@@ -50,7 +50,10 @@ const RootLayout = () => {
       <ToastProvider>
         <Stack>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(tabs)"
+            options={{ headerShown: false, headerTitle: false }}
+          />
           <Stack.Screen name="+not-found" />
           <Stack.Screen name="(public)" options={{ headerShown: false }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
