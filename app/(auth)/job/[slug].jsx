@@ -18,6 +18,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { formatCurrencyRange } from "@/utils";
 import { AboutPage, CompanyPage, ReviewPage } from "@/components";
 import { height } from "@/lib/InfoDevice";
+import { router } from "expo-router";
 const JobDetail = () => {
   const [clickTab, setClickTab] = useState("About");
   const tabs = ["About", "Company", "Review"];
@@ -278,7 +279,7 @@ const JobDetail = () => {
         }}
       >
         <Button
-          // onPress={() => handleNextStep()}
+          onPress={() => router.push("/(auth)/jobapplicationform/1")}
           type="full"
           title="Apply for Job"
         />
