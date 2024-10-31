@@ -4,6 +4,8 @@ import { FlashList } from "@shopify/flash-list";
 import { Searchbar } from "react-native-paper";
 import { IconButton } from "@/components/ui";
 import { JobItem } from "@/components";
+import { FontAwesome } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const jobCategories = ["All", "Accountant", "BDM", "Content"];
 
@@ -44,7 +46,7 @@ const mockJobs = [
   // Add more mock jobs as needed
 ];
 
-export default function BookMark() {
+export default function RecruitmentList() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState("All");
 
@@ -53,9 +55,17 @@ export default function BookMark() {
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <View className="px-4 py-2 ">
-        <View className="flex-row items-center justify-center mb-4">
-          <Text className="text-xl font-bold">Bookmarks</Text>
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="flex-1 text-xl font-bold text-center">
+            Recruitment List
+          </Text>
+          <IconButton
+            icon={<FontAwesome name="plus" size={24} />}
+            size={24}
+            onPress={() => router.push("/(auth)/jobpostform/-1")}
+          />
         </View>
+
         <Searchbar
           placeholder="Search jobs"
           onChangeText={onChangeSearch}

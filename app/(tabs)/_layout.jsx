@@ -91,6 +91,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="recruitmentlist"
+        options={{
+          title: "Recruitment",
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome name="search-minus" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
