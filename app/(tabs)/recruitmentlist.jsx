@@ -86,13 +86,13 @@ export default function RecruitmentList() {
                   selectedCategory === item ? "text-white" : "text-gray-800"
                 } font-semibold`}
               >
-                {item} {/* Đảm bảo item nằm trong component <Text> */}
+                {item}
               </Text>
             </TouchableOpacity>
           )}
           horizontal
           estimatedItemSize={50}
-          contentContainerStyle={{ paddingHorizontal: 4, marginBottom: 16 }}
+          contentContainerStyle={{ paddingHorizontal: 4 }} // Only padding here
         />
       </View>
       <View className="flex-1 pt-4  ">
