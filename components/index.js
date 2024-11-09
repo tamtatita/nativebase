@@ -3,6 +3,7 @@ import CategoryItem from "./home/CategoryItem";
 
 import AboutPage from "./home/AboutPage";
 import CompanyPage from "./home/CompanyPage";
+import ApplicantsListPage from "./home/ApplicantsListPage";
 import ReviewPage from "./home/ReviewPage";
 import Loading from "./global/Loading";
 import TitleHeader from "./global/TitleHeader";
@@ -21,5 +22,6 @@ export {
   Loading,
   TitleHeader,
   CompanyPage,
+  ApplicantsListPage,
   ReviewPage,
 };

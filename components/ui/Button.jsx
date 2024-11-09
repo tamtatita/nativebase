@@ -1,6 +1,15 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Colors } from "../../constants/Colors";
+import PropTypes from "prop-types";
+
+const propTypes = {
+  title: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(["full", "link"]),
+  onPress: PropTypes.func,
+  classNames: PropTypes.string,
+};
+
 const Button = ({ title, type, onPress, classNames }) => {
   return (
     <TouchableOpacity
@@ -19,6 +28,7 @@ const Button = ({ title, type, onPress, classNames }) => {
   );
 };
 
+Button.propTypes = propTypes;
 export default Button;
 
 const styles = StyleSheet.create({

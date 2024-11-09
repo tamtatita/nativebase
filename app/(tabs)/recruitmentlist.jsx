@@ -91,7 +91,7 @@ export default function RecruitmentList() {
             </TouchableOpacity>
           )}
           horizontal
-          estimatedItemSize={50}
+          estimatedItemSize={20}
           contentContainerStyle={{ paddingHorizontal: 4 }} // Only padding here
         />
       </View>
@@ -99,7 +99,7 @@ export default function RecruitmentList() {
         <FlashList
           data={mockJobs}
           renderItem={({ item }) => <JobItem data={item} type="large" />}
-          estimatedItemSize={200}
+          estimatedItemSize={20}
           contentContainerStyle={{ paddingHorizontal: 20 }}
         />
       </View>

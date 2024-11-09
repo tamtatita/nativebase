@@ -38,6 +38,7 @@ const Profile = () => {
     {
       title: "Thông tin cá nhân",
       icon: <Feather name="user" size={30} color={Colors.primary} />,
+      link: "/(auth)/applicantprofile",
     },
     {
       title: "Phân tích",

@@ -118,7 +118,7 @@ export default function JobPostForm() {
                 <TouchableOpacity
                   key={model}
                   onPress={() => setSelectedWorkingModel(model)}
-                  className={`mr-2 py-1 px-3 rounded-full ${
+                  className={`mr-2 py-2 px-3 rounded-full ${
                     selectedWorkingModel === model
                       ? "bg-primary"
                       : "bg-gray-200"
@@ -153,7 +153,7 @@ export default function JobPostForm() {
                 <TouchableOpacity
                   key={type}
                   onPress={() => setSelectedJobType(type)}
-                  className={`mr-2 py-1 px-3 rounded-full ${
+                  className={`mr-2 py-2 px-3 rounded-full ${
                     selectedJobType === type ? "bg-primary" : "bg-gray-200"
                   }`}
                 >
@@ -182,7 +182,7 @@ export default function JobPostForm() {
                 <TouchableOpacity
                   key={level}
                   onPress={() => setSelectedExperienceLevel(level)}
-                  className={`mr-2 py-1 px-3 rounded-full ${
+                  className={`mr-2 py-2 px-3 rounded-full ${
                     selectedExperienceLevel === level
                       ? "bg-primary"
                       : "bg-gray-200"

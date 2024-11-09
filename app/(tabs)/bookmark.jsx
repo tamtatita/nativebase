@@ -81,7 +81,7 @@ export default function BookMark() {
             </TouchableOpacity>
           )}
           horizontal
-          estimatedItemSize={50}
+          estimatedItemSize={20}
           contentContainerStyle={{ paddingHorizontal: 4, marginBottom: 16 }}
         />
       </View>
@@ -89,7 +89,7 @@ export default function BookMark() {
         <FlashList
           data={mockJobs}
           renderItem={({ item }) => <JobItem data={item} type="large" />}
-          estimatedItemSize={200}
+          estimatedItemSize={20}
           contentContainerStyle={{ paddingHorizontal: 20 }}
         />
       </View>
