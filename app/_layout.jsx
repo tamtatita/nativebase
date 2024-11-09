@@ -1,7 +1,7 @@
 import { Slot, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Text } from "react-native";
+import { Modal, Text } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import useAuth from "@/hooks/useAuth";

@@ -14,16 +14,12 @@
     },
     "ios": {
       "supportsTablet": true
-      // "bundleIdentifier": "com.galaxies.firebase",
-      // "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
-      // "package": "com.galaxies.firebase",
-      // "googleServicesFile": "./GoogleService-Info.plist"
     },
     "web": {
       "bundler": "metro",
@@ -39,16 +35,6 @@
           "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
         }
       ]
-      // [
-      //   "expo-build-properties",
-      //   {
-      //     "ios": {
-      //       "useFrameworks": "static"
-      //     }
-      //   }
-      // ],
-      // "@react-native-firebase/app",
-      // "@react-native-firebase/auth"
     ],
     "experiments": {
       "typedRoutes": true

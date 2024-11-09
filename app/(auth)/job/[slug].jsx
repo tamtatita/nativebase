@@ -18,9 +18,51 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { formatCurrencyRange } from "@/utils";
 import { AboutPage, CompanyPage, ReviewPage } from "@/components";
 import { height } from "@/lib/InfoDevice";
+import { router } from "expo-router";
+import ApplicantsListPage from "../../../components/home/ApplicantsListPage";
+
+const mockPeople = [
+  {
+    id: "1",
+    name: "Jenny Wilson",
+    role: "UI/UX Designer",
+    avatar: "https://example.com/jenny.jpg",
+  },
+  {
+    id: "2",
+    name: "Brooklyn Simmons",
+    role: "Graphics Designer",
+    avatar: "https://example.com/brooklyn.jpg",
+  },
+  {
+    id: "3",
+    name: "Jane Cooper",
+    role: "React Native Developer",
+    avatar: "https://example.com/jane.jpg",
+  },
+  {
+    id: "4",
+    name: "Ronald Richards",
+    role: "Flutter Developer",
+    avatar: "https://example.com/ronald.jpg",
+  },
+  {
+    id: "5",
+    name: "Marvin McKinney",
+    role: "React JS Developer",
+    avatar: "https://example.com/marvin.jpg",
+  },
+  {
+    id: "6",
+    name: "Arlene McCoy",
+    role: "Product Designer",
+    avatar: "https://example.com/arlene.jpg",
+  },
+];
+
 const JobDetail = () => {
   const [clickTab, setClickTab] = useState("About");
-  const tabs = ["About", "Company", "Review"];
+  const tabs = ["About", "Company", "Applicants"];
 
   const handleChangeTab = (type) => {
     setClickTab(type);
@@ -253,7 +295,9 @@ const JobDetail = () => {
                 <View>
                   {clickTab === "About" && <AboutPage data={data} />}
                   {clickTab === "Company" && <CompanyPage data={data} />}
-                  {clickTab === "Review" && <ReviewPage />}
+                  {clickTab === "Applicants" && (
+                    <ApplicantsListPage data={mockPeople} />
+                  )}
                 </View>
               </>
             );
@@ -278,7 +322,7 @@ const JobDetail = () => {
         }}
       >
         <Button
-          // onPress={() => handleNextStep()}
+          onPress={() => router.push("/(auth)/jobapplicationform/1")}
           type="full"
           title="Apply for Job"
         />
