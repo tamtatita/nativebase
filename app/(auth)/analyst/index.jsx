@@ -69,6 +69,7 @@ const AnalystPage = () => {
 
   return (
     <FlashList
+      estimatedItemSize={4}
       ListHeaderComponent={() => (
         <>
           <RenderHeader />

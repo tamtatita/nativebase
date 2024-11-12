@@ -8,6 +8,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { CategoryItem, JobItem } from "@/components";
 import { height } from "@/lib/InfoDevice";
 import { router } from "expo-router";
+import { Colors } from "@/constants/Colors";
 const Index = () => {
   const jobs = [
     {
@@ -128,7 +129,7 @@ const Index = () => {
               shape={"roundedSquare"}
               size={"small"}
               classNames={"rounded-xl"}
-              color="#6366f1"
+              color={Colors.green}
               icon={
                 <Ionicons name="notifications-sharp" size={24} color="white" />
               }

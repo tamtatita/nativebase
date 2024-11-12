@@ -9,9 +9,9 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { StatusBar } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function TabLayout() {
-  // Sử dụng useEffect để ẩn StatusBar khi component được mount
   useEffect(() => {
     StatusBar.setHidden(true); // Ẩn StatusBar cho toàn bộ các tabs
     return () => StatusBar.setHidden(false); // Hiển thị lại khi unmount (tuỳ chọn)
@@ -58,12 +58,22 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="bookmark"
         options={{
           title: "Bookmark",
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome6 name="book-bookmark" size={24} color={color} />
+          ),
+        }}
+      /> */}
+
+      <Tabs.Screen
+        name="manager"
+        options={{
+          title: "Manager",
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialIcons name="manage-accounts" size={24} color={color} />
           ),
         }}
       />

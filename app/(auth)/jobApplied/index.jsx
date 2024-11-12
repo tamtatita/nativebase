@@ -1,7 +1,7 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React, { memo, useCallback } from "react";
 import { FlashList } from "@shopify/flash-list";
-import { IconButton } from "../../../components/ui";
+import { IconButton } from "@/components/ui";
 import { Feather } from "@expo/vector-icons";
 import { JobItem } from "@/components";
 const JobApplied = () => {
@@ -86,23 +86,26 @@ const JobApplied = () => {
     },
   ];
   const RenderBody = useCallback(() => {
+    console.log(data, "data");
     return (
       <View className="p-5">
         <FlashList
           estimatedListSize={4}
           data={data}
           renderItem={({ item }) => <JobItem data={item} type="applied" />}
+          keyExtractor={(item) => item.id.toString()}
         />
       </View>
     );
   }, [data]);
   return (
     <FlashList
+      estimatedItemSize={1}
       ListHeaderComponent={() => (
         <>
           <RenderHeader />
 
-          <RenderBody />
+          {/* <RenderBody /> */}
         </>
       )}
     />

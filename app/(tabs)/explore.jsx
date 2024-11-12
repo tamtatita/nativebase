@@ -238,7 +238,7 @@ const CompanyMap = () => {
         <TouchableOpacity onPress={zoomOut} />
       </View>
 
-      <BottomSheet index={0} snapPoints={snapPoints}>
+      <BottomSheet index={1} snapPoints={snapPoints}>
         <View style={{ flex: 1 }}>
           <Text style={styles.listTitle}>Over {companies?.length} places</Text>
           <BottomSheetFlatList

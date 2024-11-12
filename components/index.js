@@ -10,7 +10,9 @@ import ChatItem from "./chat/ChatItem";
 import OpenJobs from "./company/OpenJobs";
 import People from "./company/People";
 import Gallery from "./company/Gallery";
+import ListJobApplied from "./manager/ListJobApplied";
 export {
+  ListJobApplied,
   Gallery,
   People,
   OpenJobs,
