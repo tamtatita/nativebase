@@ -1,55 +1,37 @@
 import { Slot, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
-import * as SecureStore from "expo-secure-store";
-import { Modal, Text } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
-import useAuth from "@/hooks/useAuth";
 import { ToastProvider } from "@/hooks/useToast";
-SplashScreen.preventAutoHideAsync();
+import AuthProvider from "@/components/providers/AuthProvider"; // Ensure correct import
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+SplashScreen.preventAutoHideAsync();
+
 const RootLayout = () => {
-  const segments = useSegments();
-  const router = useRouter();
-  const { loading, user } = useAuth();
   const [fontsLoaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // Hàm điều hướng khi đã xác thực người dùng hoặc chưa
-  // console.log(user?.displayName, "000");
-  useEffect(() => {
-    if (loading === false && fontsLoaded) {
-      // Điều hướng dựa trên trạng thái xác thực của người dùng
-      if (user) {
-        // if (user?.displayName === undefined || user?.displayName === null) {
-        //   router.replace("/(public)/complete");
-        // } else {
-        router.replace("/(tabs)");
-        // }
-      } else {
-        router.replace("/(public)/login");
-      }
-    }
-  }, [loading, fontsLoaded, user]);
-
   // Hiển thị hoặc ẩn SplashScreen khi fonts được tải
   useEffect(() => {
-    if (fontsLoaded && loading === false) {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, loading]);
+  }, [fontsLoaded]);
 
   // Nếu fonts hoặc trạng thái xác thực chưa load thì trả về null
-  if (!fontsLoaded || loading === true) {
+  if (!fontsLoaded) {
     return null;
   }
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <ToastProvider>
         <Stack>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <AuthProvider>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          </AuthProvider>
           <Stack.Screen
             name="(tabs)"
             options={{ headerShown: false, headerTitle: false }}

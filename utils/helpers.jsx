@@ -16,7 +16,7 @@ export function handleError(error, from) {
       message = message["odata.error"]?.message?.value;
     }
 
-    if (error.response?.status === 401) {
+    if (error?.response?.status === 401) {
       message = "401";
     }
   } else {
