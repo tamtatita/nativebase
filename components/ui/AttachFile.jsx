@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Alert, FlatList } from "react-native";
+import * as DocumentPicker from "expo-document-picker";
 
 const AttachMultipleFiles = () => {
   const [files, setFiles] = useState([
@@ -8,22 +9,21 @@ const AttachMultipleFiles = () => {
   ]);
 
   // Chọn nhiều file
-  // const pickFiles = async () => {
-  //   try {
-  //     const res = await DocumentPicker.pickMultiple({
-  //       type: "*/*", // Cho phép chọn mọi loại file
-  //     });
+  const pickFiles = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        multiple: true,
+      });
 
-  //     // Thêm các file đã chọn vào state
-  //     setFiles((prevFiles) => [...prevFiles, ...res]);
-  //   } catch (err) {
-  //     if (DocumentPicker.isCancel(err)) {
-  //       console.log("User canceled the picker");
-  //     } else {
-  //       Alert.alert("Error picking files", err.message);
-  //     }
-  //   }
-  // };
+      if (result.type === "success") {
+        setFiles((prevFiles) => [...prevFiles, ...result.output]);
+        console.log(result.output);
+      }
+    } catch (err) {
+      console.log("Error picking files: ", err);
+    }
+  };
 
   // Hiển thị danh sách các file đã chọn
   const renderItem = ({ item }) => (
@@ -33,9 +33,9 @@ const AttachMultipleFiles = () => {
   );
 
   return (
-    <View className="flex-1 justify-center items-center ">
+    <View className="flex-1 justify-center items-center">
       <TouchableOpacity
-        // onPress={pickFiles}
+        onPress={pickFiles}
         className="bg-blue-500 p-4 rounded-full mb-4"
       >
         <Text className="text-white font-bold">Pick Files</Text>

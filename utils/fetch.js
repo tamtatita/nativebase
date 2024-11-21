@@ -64,3 +64,27 @@ export const fetchAuth = async ({
     }
   }
 };
+
+export const fetchAxios = async ({
+  url,
+  headers,
+  method,
+  data,
+  ...options
+}) => {
+  // console.time(url)
+  const res = await axios({
+    url,
+    method,
+    data,
+    timeout: config.TIMEOUT,
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+    ...options,
+  });
+
+  // console.timeEnd(url)
+  return res.data;
+};

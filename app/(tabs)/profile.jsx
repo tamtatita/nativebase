@@ -21,9 +21,10 @@ import {
 } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { router } from "expo-router";
+import { useAuth } from "../../components/providers/AuthProvider";
 
 const Profile = () => {
-  const auth = FIREBASE_AUTH;
+  const { logout } = useAuth();
   const user = {
     name: "John Doe",
     image:
@@ -58,6 +59,13 @@ const Profile = () => {
     {
       title: "Cài đặt",
       icon: <Feather name="settings" size={30} color={Colors.primary} />,
+    },
+    {
+      title: "Đăng xuất",
+      icon: <Feather name="log-out" size={30} color={Colors.primary} />,
+      onClick: async () => {
+        await logout();
+      },
     },
   ];
   return (
@@ -102,7 +110,14 @@ const Profile = () => {
                     data={dataList}
                     renderItem={({ item }) => (
                       <TouchableOpacity
-                        onPress={() => router.push(item.link)}
+                        onPress={() => {
+                          if (item.link) {
+                            router.push(item.link);
+                          }
+                          if (item.onClick) {
+                            item.onClick();
+                          }
+                        }}
                         className="flex flex-row items-center py-2 gap-1 my-1 justify-between"
                       >
                         <View className="flex items-center gap-x-3 flex-row">

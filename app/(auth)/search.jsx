@@ -5,6 +5,8 @@ import { IconButton } from "@/components/ui";
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { JobItem } from "@/components";
+import { getItemsService } from "../../utils/services";
+import lists from "../../utils/lists";
 const Search = () => {
   const recentSearch = ["UI, UX", "Frontend", "Backend"];
   const recentView = [
@@ -64,6 +66,8 @@ const Search = () => {
       applicantsView: 789,
     },
   ];
+  const [accounts, setAccounts] = React.useState([]);
+
   const RenderHeader = useCallback(() => {
     return (
       <View>

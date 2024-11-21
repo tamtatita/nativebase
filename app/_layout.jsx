@@ -5,7 +5,8 @@ import { useFonts } from "expo-font";
 import { ToastProvider } from "@/hooks/useToast";
 import AuthProvider from "@/components/providers/AuthProvider"; // Ensure correct import
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
+import { Provider } from "react-redux";
+import { store } from "../store";
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
@@ -13,34 +14,33 @@ const RootLayout = () => {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // Hiển thị hoặc ẩn SplashScreen khi fonts được tải
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
-  // Nếu fonts hoặc trạng thái xác thực chưa load thì trả về null
   if (!fontsLoaded) {
     return null;
   }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ToastProvider>
-        <Stack>
+      <Provider store={store}>
+        <ToastProvider>
           <AuthProvider>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(tabs)"
+                options={{ headerShown: false, headerTitle: false }}
+              />
+              <Stack.Screen name="(public)" options={{ headerShown: false }} />
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+            </Stack>
           </AuthProvider>
-          <Stack.Screen
-            name="(tabs)"
-            options={{ headerShown: false, headerTitle: false }}
-          />
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen name="(public)" options={{ headerShown: false }} />
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-        </Stack>
-      </ToastProvider>
+        </ToastProvider>
+      </Provider>
     </GestureHandlerRootView>
   );
 };

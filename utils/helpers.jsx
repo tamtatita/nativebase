@@ -36,3 +36,14 @@ export function handleError(error, from) {
 
   return message;
 }
+
+export const capitalizeKeys = (obj) => {
+  const newObj = {};
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const newKey = key.charAt(0).toUpperCase() + key.slice(1);
+      newObj[newKey] = obj[key];
+    }
+  }
+  return newObj;
+};

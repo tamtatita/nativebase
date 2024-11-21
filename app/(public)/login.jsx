@@ -23,9 +23,14 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import useAuth from "../../hooks/useAuth";
 import { handleSigninGoogle } from "../../utils/auth";
 import { useToast } from "../../hooks/useToast";
+import { getAuth, loginService } from "../../utils/services";
+import * as SecureStore from "expo-secure-store";
+import config from "../../utils/config";
+import { LOGIN_TYPES } from "../../constants";
+import { useAuth } from "../../components/providers/AuthProvider";
+import { handleError } from "../../utils/helpers";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -34,47 +39,80 @@ const Login = () => {
   });
   const auth = FIREBASE_AUTH;
   const { showToast } = useToast();
-
+  const { setProfile } = useAuth();
   const handleOpenPass = (type) => {
     setOpenPass({ ...openPass, [type]: !openPass[type] });
   };
 
   const handleSubmitForm = async (values) => {
     try {
-      const user = await signInWithEmailAndPassword(
-        auth,
-        values?.email,
-        values?.password
+      const loginRes = await loginService(values.email, values.password);
+
+      await SecureStore.setItemAsync(
+        config.LOCAL_ACCESS_TOKEN,
+        loginRes.token.accessToken
       );
-      console.log(user, "user");
+      await SecureStore.setItemAsync(
+        config.LOCAL_REFRESH_TOKEN,
+        loginRes.token.refreshToken
+      );
+      await SecureStore.setItemAsync(
+        config.LOCAL_AUTHENTICATED,
+        JSON.stringify(loginRes)
+      );
+      await SecureStore.setItemAsync(
+        config.LOCAL_LOGIN_TYPE,
+        JSON.stringify(LOGIN_TYPES.MANUAL)
+      );
 
-      if (user || true) {
-        showToast({
-          message: "Đăng nhập thành công",
-          type: "success",
-          timeClose: 2000,
-        });
-
-        if (
-          user.user.displayName === undefined ||
-          user.user.displayName === ""
-        ) {
-          console.log(user, "user");
-          router.replace("/complete");
-        }
-        // setTimeout(() => {
-        //   router.replace("(tabs)");
-        // }, 2000);
-      } else {
-        showToast({
-          message: "Tài khoản hoặc mật khẩu không đúng",
-          type: "error",
-          timeClose: 2000,
-        });
-      }
+      const newProfile = await getAuth();
+      await SecureStore.setItemAsync(
+        config.LOCAL_PROFILE,
+        JSON.stringify(newProfile)
+      );
+      setProfile(newProfile);
+      // showToast({
+      //   message: "Đăng nhập thành công",
+      //   type: "success",
+      //   timeClose: 2000,
+      // });
+      // const user = await signInWithEmailAndPassword(
+      //   auth,
+      //   values?.email,
+      //   values?.password
+      // );
+      // console.log(user, "user");
+      // if (user || true) {
+      //   showToast({
+      //     message: "Đăng nhập thành công",
+      //     type: "success",
+      //     timeClose: 2000,
+      //   });
+      //   if (
+      //     user.user.displayName === undefined ||
+      //     user.user.displayName === ""
+      //   ) {
+      //     console.log(user, "user");
+      //     router.replace("/complete");
+      //   }
+      //   // setTimeout(() => {
+      //   //   router.replace("(tabs)");
+      //   // }, 2000);
+      // } else {
+      //   showToast({
+      //     message: "Tài khoản hoặc mật khẩu không đúng",
+      //     type: "error",
+      //     timeClose: 2000,
+      //   });
+      // }
     } catch (error) {
-      console.log(error);
-      alert("Sign in failed: " + error.message);
+      const message = handleError(error);
+
+      if (message.indexOf("Incorrect") > -1) {
+        console.error("Thông tin đăng nhập chưa chính xác!");
+      } else {
+        console.error("Lỗi hệ thống, vui lòng thử lại trong giây lát!");
+      }
     }
   };
 

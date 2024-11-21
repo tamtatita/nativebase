@@ -21,7 +21,7 @@ const IconButton = ({
 
   // Định nghĩa hình dạng button dựa trên prop shape
   const shapeStyle = {
-    circle: { borderRadius: "100%" },
+    circle: { borderRadius: 100 },
     square: { borderRadius: 0 },
     roundedSquare: { borderRadius: 10 },
   }[shape] || { borderRadius: 0 }; // Mặc định là square nếu không có shape
@@ -36,7 +36,10 @@ const IconButton = ({
         styles.button,
         sizeStyle,
         shapeStyle,
-        { backgroundColor: buttonColor, borderRadius: type === "back" && 99 },
+        {
+          backgroundColor: buttonColor,
+          borderRadius: type === "back" ? 99 : 1,
+        },
       ]}
       onPress={type === "back" ? router.back : onPress}
     >
