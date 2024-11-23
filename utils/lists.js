@@ -1,154 +1,150 @@
-import config from './config'
+import config from "./config";
 
 const lists = {
   Accounts: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Accounts'
+    listName: "Accounts",
   },
   AttachmentStore: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'AttachmentStore'
+    listName: "AttachmentStore",
   },
   ImageList: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'ImageList'
+    listName: "ImageList",
   },
   ImageTestList: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'ImageTestList'
+    listName: "ImageTestList",
   },
   DocumentStore: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'DocumentStore'
+    listName: "DocumentStore",
   },
   Users: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Users'
+    listName: "Users",
   },
   WorkLocations: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'WorkLocations'
+    listName: "WorkLocations",
   },
   Locations: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Locations'
+    listName: "Locations",
   },
   Areas: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Areas'
+    listName: "Areas",
   },
   WalkPlanContent: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'WalkPlanContents'
+    listName: "WalkPlanContents",
   },
   WalkPlanContentDetail: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'WalkPlanContentDetails'
+    listName: "WalkPlanContentDetails",
   },
   Machines: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Machines'
+    listName: "Machines",
   },
   Processes: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Processes'
+    listName: "Processes",
   },
   Tasks: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Tasks'
+    listName: "Tasks",
   },
   QuestionList: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'QuestionList'
+    listName: "QuestionList",
   },
   EHSReporting: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSReporting'
+    listName: "EHSReporting",
   },
   Serverity: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Serverity'
+    listName: "Serverity",
   },
   ReportSubjects: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'ReportSubjects'
+    listName: "ReportSubjects",
   },
   AreaDepartments: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'AreaDepartments'
+    listName: "AreaDepartments",
   },
   Departments: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Departments'
+    listName: "Departments",
   },
   EHSInvolvingPerson: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSInvolvingPerson'
+    listName: "EHSInvolvingPerson",
   },
   EmployeeTypes: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EmployeeTypes'
+    listName: "EmployeeTypes",
   },
   EHSQuestionListDetail: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSQuestionListDetail'
+    listName: "EHSQuestionListDetail",
   },
   Menu: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'Menus'
+    listName: "Menus",
   },
   ProductionLines: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'ProductionLines'
+    listName: "ProductionLines",
   },
   StandardType: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'StandardTypes'
+    listName: "StandardTypes",
   },
   BSSCoaching: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'BSSCoachings'
+    listName: "BSSCoachings",
   },
   EHSReportingPermission: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSReportingPermission'
+    listName: "EHSReportingPermission",
   },
   EHSReceiver: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSReceiver'
+    listName: "EHSReceiver",
   },
   EHSVerify: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSVerify'
+    listName: "EHSVerify",
   },
   EHSHistory: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSHistory'
+    listName: "EHSHistory",
   },
   InspectionRecords: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'InspectionRecords'
+    listName: "InspectionRecords",
   },
   InspectionChecklists: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'InspectionChecklists'
-  },
-  InspectionGroups: {
-    site: config.EHS_GEMBA_SITE,
-    listName: 'InspectionGroups'
-  },
-  WalkPlanContentParticipants: {
-    site: config.EHS_GEMBA_SITE,
-    listName: 'WalkPlanContentParticipants'
+    listName: "InspectionChecklists",
   },
   StoreRecords: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'StoreRecords'
+    listName: "StoreRecords",
   },
-  EHSServerities: {
+  Tests: {
     site: config.EHS_GEMBA_SITE,
-    listName: 'EHSServerities'
-  }
-}
+    listName: "Tests",
+  },
+  TestDetails: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "TestDetails",
+  },
+};
 
-export default lists
+export default lists;
