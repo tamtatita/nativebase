@@ -18,11 +18,11 @@ export const hashPasswordService = async (password) =>
     params: { rawstring: password },
     method: "post",
   });
-export const registerServiceForUser = async (userName, password, userId) =>
-  fetchAuth({
+export const registerServiceForUser = async (userName, password) =>
+  fetchAxios({
     url: "/api/Auth/register",
     method: "post",
-    data: { userName, password, userId, accountType: "User" },
+    data: { userName, password },
   });
 
 export const changePasswordService = async (oldPassword, newPassword) =>
