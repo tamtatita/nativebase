@@ -100,6 +100,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="demo"
+        options={{
+          title: "demo",
+          tabBarIcon: ({ color, focused }) => (
+            <FontAwesome name="search-minus" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
