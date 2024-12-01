@@ -47,3 +47,10 @@ export const capitalizeKeys = (obj) => {
   }
   return newObj;
 };
+
+export const removeGuidFromFileName = (fileName) => {
+  if (fileName?.includes("_")) {
+    return fileName.split("_").slice(1).join("_");
+  }
+  return fileName;
+};

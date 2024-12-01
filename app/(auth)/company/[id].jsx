@@ -159,7 +159,7 @@ const CompanyDetail = () => {
           <Text className="text-black font-bold text-lg">Company Detail</Text>
 
           <View
-            style={{ display: "flex", gap: "20px" }}
+            style={{ display: "flex", gap: 20 }}
             className="flex flex-row items-center gap-2"
           >
             <IconButton

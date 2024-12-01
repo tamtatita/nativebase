@@ -6,13 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-  StyleSheet,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import { IconButton, Button } from "@/components/ui";
 import { FontAwesome } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
 import AttachFile from "../../../components/ui/AttachFile";
+import { useSelector } from "react-redux";
+import { MODULE_AUTH } from "../../../store/auth";
 
 // Mock data for radio button groups
 const workingModels = ["Remote", "Hybrid", "On-Site"];
@@ -47,6 +48,8 @@ const ApplicantProfile = () => {
   const [selectedExperience, setSelectedExperience] = useState("");
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const { currentUser } = useSelector((state) => state[MODULE_AUTH]);
 
   // Error handling
   const showError = (field) => isSubmitted && !field;
@@ -229,7 +232,7 @@ const ApplicantProfile = () => {
               field={selectedJobTitle}
             />
 
-            <AttachFile />
+            <AttachFile dataSource="Users" refId={currentUser?.Id} />
 
             {/* Update Button */}
             <TouchableOpacity

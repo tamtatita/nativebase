@@ -98,7 +98,7 @@ const JobDetail = () => {
           <IconButton type="back" />
 
           <View
-            style={{ display: "flex", gap: "20px" }}
+            style={{ display: "flex" }}
             className="flex flex-row items-center gap-2"
           >
             <IconButton
