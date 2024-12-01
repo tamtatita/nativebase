@@ -87,8 +87,11 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (profile && !isGettingUser) {
-      // router.replace("/(tabs)"); // Điều hướng về trang tabs sau khi fetch user
-      router.replace("/(auth)/usertype"); // Điều hướng về trang tabs sau khi fetch user
+      if (profile?.user?.isInputInformation) {
+        router.replace("/(tabs)"); // Điều hướng về trang tabs sau khi fetch user
+      } else {
+        router.replace("/(auth)/usertype"); // Điều hướng về trang tabs sau khi fetch user
+      }
     } else if (!profile && !isGettingUser) {
       router.replace("/(public)/login"); // Điều hướng về trang login nếu không có profile
     }

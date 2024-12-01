@@ -7,6 +7,7 @@ import AuthProvider from "@/components/providers/AuthProvider"; // Ensure correc
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider } from "react-redux";
 import { store } from "../store";
+import { PaperProvider } from "react-native-paper";
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
@@ -28,17 +29,22 @@ const RootLayout = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <ToastProvider>
-          <AuthProvider>
-            <Stack>
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="(tabs)"
-                options={{ headerShown: false, headerTitle: false }}
-              />
-              <Stack.Screen name="(public)" options={{ headerShown: false }} />
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-            </Stack>
-          </AuthProvider>
+          <PaperProvider>
+            <AuthProvider>
+              <Stack>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="(tabs)"
+                  options={{ headerShown: false, headerTitle: false }}
+                />
+                <Stack.Screen
+                  name="(public)"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+              </Stack>
+            </AuthProvider>
+          </PaperProvider>
         </ToastProvider>
       </Provider>
     </GestureHandlerRootView>

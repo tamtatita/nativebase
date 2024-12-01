@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,31 +11,34 @@ import { IconButton, Button } from "../../../components/ui";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import Section from "../../../components/jobapplicationform/Section";
+import PreviewFilePDF from "../../../components/ui/PreviewFilePDF";
+import { useSelector } from "react-redux";
+import { MODULE_AUTH } from "../../../store/auth";
+import { getItemsService } from "../../../utils/services";
+import lists from "../../../utils/lists";
+import { removeGuidFromFileName } from "../../../utils/helpers";
 
-// Dữ liệu mẫu cho CV của ứng viên
-const mockCVs = [
-  { id: "cv1", name: "CV1.pdf", fileUrl: "https://example.com/cv1.pdf" },
-  { id: "cv2", name: "CV2.pdf", fileUrl: "https://example.com/cv2.pdf" },
-  { id: "cv3", name: "CV3.pdf", fileUrl: "https://example.com/cv3.pdf" },
-];
+const defaultUserData = {
+  fullName: "Nguyen Van A",
+  phone: "0123456789",
+  location: "1234 Trần Hưng Đạo, TP.HCM",
+  jobTags: ["Developer", "Full-Time", "3 Years Experience", "Remote"],
+};
 
 const JobApplicationForm = () => {
   // Dữ liệu mặc định của ứng viên từ tài khoản đăng nhập
-  const defaultUserData = {
-    fullName: "Nguyen Van A",
-    phone: "0123456789",
-    location: "1234 Trần Hưng Đạo, TP.HCM",
-    jobTags: ["Developer", "Full-Time", "3 Years Experience", "Remote"],
-  };
-
+  const { currentUser } = useSelector((state) => state[MODULE_AUTH]);
   // State cho thông tin mô tả và CV chọn
   const [description, setDescription] = useState("");
   const [selectedCV, setSelectedCV] = useState({});
   const [isSubmmited, setIsSubmmited] = useState(false);
+  const [storeRecords, setStoreRecords] = useState([]);
+  const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+  const [selectedPreviewFile, setSelectedPreviewFile] = useState(null);
 
-  const handleCVView = (fileUrl) => {
-    // Mở file CV trong trình duyệt hoặc ứng dụng xem file
-    // Ví dụ: Linking.openURL(fileUrl);
+  const handleCVView = (cvFile) => {
+    setSelectedPreviewFile(cvFile);
+    setIsPreviewVisible(true);
   };
 
   const handleSubmit = () => {
@@ -49,6 +52,20 @@ const JobApplicationForm = () => {
       selectedCV,
     });
   };
+
+  const handleGetStoreRecords = async (currentUser) => {
+    const storeRecords = await getItemsService(lists.StoreRecords, {
+      filter: `RefID eq ${currentUser.Id} and DataSource eq '${lists.Users.listName}'`,
+    });
+
+    setStoreRecords(storeRecords.value);
+  };
+
+  useEffect(() => {
+    if (currentUser?.Id) {
+      handleGetStoreRecords(currentUser);
+    }
+  }, [currentUser]);
 
   return (
     <SafeAreaView className="flex-1 ">
@@ -78,18 +95,18 @@ const JobApplicationForm = () => {
             <View className="flex flex-col gap-[1px] ">
               <View className="flex flex-row gap-2">
                 <FontAwesome name="user" size={20} />
-                <Text className="text-gray-400 ">
-                  {defaultUserData.fullName}
-                </Text>
+                <Text className="text-gray-400 ">{currentUser?.FullName}</Text>
               </View>
               <View className="flex flex-row gap-2">
                 <FontAwesome name="phone" size={20} />
-                <Text className="text-gray-400">{defaultUserData.phone}</Text>
+                <Text className="text-gray-400">
+                  {currentUser?.Phone || "N/A"}
+                </Text>
               </View>
               <View className="flex flex-row gap-2">
                 <FontAwesome name="map-marker" size={20} />
                 <Text className="text-gray-400 ">
-                  {defaultUserData.location}
+                  {currentUser?.Location || "N/A"}
                 </Text>
               </View>
             </View>
@@ -134,27 +151,29 @@ const JobApplicationForm = () => {
               CV to Apply <Text className="text-red-500">*</Text>{" "}
             </Text>
             <View>
-              {mockCVs.map((cv) => (
+              {storeRecords.map((cv) => (
                 <View
-                  key={cv.id}
+                  key={cv.Id}
                   className="flex flex-row items-center justify-between mb-3 gap-2"
                 >
                   <FontAwesome5
                     name="file-pdf"
                     size={20}
                     color={
-                      selectedCV.id === cv.id ? Colors.primary : "transparent"
+                      selectedCV.Id === cv.Id ? Colors.primary : "transparent"
                     }
                   />
                   <TouchableOpacity
                     className={`flex flex-row items-center  flex-1 rounded-md p-3 bg-primary ${
-                      selectedCV.id === cv.id ? "" : "opacity-50"
+                      selectedCV.Id === cv.Id ? "" : "opacity-50"
                     }`}
                     onPress={() => setSelectedCV(cv)}
                   >
-                    <Text className="mr-2 text-white ">{cv.name}</Text>
+                    <Text className="mr-2 text-white ">
+                      {removeGuidFromFileName(cv.Name)}
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleCVView(cv.fileUrl)}>
+                  <TouchableOpacity onPress={() => handleCVView(cv)}>
                     <FontAwesome name="eye" size={20} color={Colors.primary} />
                   </TouchableOpacity>
                 </View>
@@ -175,6 +194,18 @@ const JobApplicationForm = () => {
             <Text className="text-white font-bold text-lg">Apply Job</Text>
           </TouchableOpacity>
         </View>
+        {
+          // Xem trước file PDF
+          isPreviewVisible && (
+            <PreviewFilePDF
+              handleDismiss={() => {
+                setIsPreviewVisible(false);
+                setSelectedPreviewFile(null);
+              }}
+              file={selectedPreviewFile}
+            />
+          )
+        }
       </ScrollView>
     </SafeAreaView>
   );

@@ -162,28 +162,6 @@ export const getFileInfoService = async (site, serverRelativeUrl) =>
     method: "get",
   });
 
-export const uploadFileService = async (
-  list,
-  storeID,
-  fileName,
-  file,
-  handlePercent
-) => {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  return fetchAuth({
-    url: "/Sharepoints/file",
-    params: {
-      url: endpoints.addAttachment(list.site, list.listName, storeID, fileName),
-    },
-    data: formData,
-    method: "post",
-    headers: { "Content-Type": "multipart/form-data" },
-    onUploadProgress: handlePercent,
-  });
-};
-
 export const uploadFileToDocLibService = async (
   serverRelativeUrl,
   fileName,
@@ -195,7 +173,12 @@ export const uploadFileToDocLibService = async (
   formData.append("file", file);
 
   return fetchAuth({
-    url: endpoints.addFile(serverRelativeUrl, fileName, refID, dataSource),
+    url: endpoints.addFile(
+      serverRelativeUrl,
+      encodeURIComponent(fileName),
+      refID,
+      dataSource
+    ),
     data: formData,
     method: "post",
     headers: { "Content-Type": "multipart/form-data" },
