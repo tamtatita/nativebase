@@ -17,7 +17,7 @@ import { FontAwesome } from "@expo/vector-icons";
 
 const propTypes = {
   refId: PropTypes.string,
-  dataSource: PropTypes.array,
+  dataSource: PropTypes.string,
 };
 const SERVERRELATIVEURL = "/DocumentStore";
 const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
@@ -27,7 +27,6 @@ const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
   const [loadingState, setLoadingState] = useState("");
 
   const showModal = (selectedDeleteFile) => {
-    console.log("selectedDeleteFile", selectedDeleteFile);
     setSelectedDeleteFile(selectedDeleteFile);
     setIsShowDeleteModal(true);
   };
@@ -65,15 +64,12 @@ const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
         audioFile
       );
       await handleGetFiles();
-      console.log("newFiles", newFiles);
     } catch (err) {
       console.log("Error picking files: ", err);
     } finally {
       setLoadingState("");
     }
   };
-
-  console.log(selectedDeleteFile);
 
   const handleDeleteFile = async () => {
     try {
@@ -89,18 +85,23 @@ const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
   };
 
   const handleGetFiles = async () => {
-    setLoadingState("getFiles");
-    const files = await getItemsService(lists.StoreRecords, {
-      filter: `RefID eq ${refId} and DataSource eq '${dataSource}' and IsFolder eq false and contains(ServerRelativeUrl, '${SERVERRELATIVEURL}')`,
-    });
-    setLoadingState("");
+    try {
+      setLoadingState("getFiles");
+      const files = await getItemsService(lists.StoreRecords, {
+        filter: `RefID eq ${refId} and DataSource eq '${dataSource}' and IsFolder eq false and contains(ServerRelativeUrl, '${SERVERRELATIVEURL}')`,
+      });
 
-    setFiles(files.value);
+      setFiles(files.value);
+    } catch (error) {
+      console.log("Error getting files: ", error);
+    } finally {
+      setLoadingState("");
+    }
   };
 
   useEffect(() => {
-    handleGetFiles();
-  }, []);
+    if (refId) handleGetFiles();
+  }, [refId, dataSource]);
 
   // Hiển thị danh sách các file đã chọn
   const renderItem = ({ item }) => (
