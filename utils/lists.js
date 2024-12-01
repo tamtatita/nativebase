@@ -1,5 +1,4 @@
 import config from "./config";
-import config from "./config";
 
 const lists = {
   Accounts: {
@@ -19,8 +18,10 @@ const lists = {
     site: config.EHS_GEMBA_SITE,
     listName: "StoreRecords",
   },
-};
+  StoreRecords: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "StoreRecords",
+  },
 };
 
-export default lists;
 export default lists;

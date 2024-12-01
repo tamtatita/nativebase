@@ -14,6 +14,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import AttachFile from "../../../components/ui/AttachFile";
 import { useSelector } from "react-redux";
 import { MODULE_AUTH } from "../../../store/auth";
+import lists from "../../../utils/lists";
 
 // Mock data for radio button groups
 const workingModels = ["Remote", "Hybrid", "On-Site"];
@@ -113,7 +114,10 @@ const ApplicantProfile = () => {
           <View className="items-center mb-6">
             <View className="relative">
               <Image
-                defaultSource={require("@/assets/images/avatar.png")}
+                // defaultSource={require("@/assets/images/avatar.png")}
+                source={{
+                  uri: "https://firebasestorage.googleapis.com/v0/b/findjob-e12bc.appspot.com/o/DocumentStore%2Fimage%206.png?alt=media&token=3f2e570b-ab3e-4dab-8997-f82be43f3790",
+                }}
                 className="w-24 h-24 rounded-full"
               />
               <TouchableOpacity
@@ -232,7 +236,10 @@ const ApplicantProfile = () => {
               field={selectedJobTitle}
             />
 
-            <AttachFile dataSource="Users" refId={currentUser?.Id} />
+            <AttachFile
+              dataSource={lists.Users.listName}
+              refId={currentUser?.Id}
+            />
 
             {/* Update Button */}
             <TouchableOpacity
