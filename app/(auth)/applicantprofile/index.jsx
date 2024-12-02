@@ -9,12 +9,13 @@ import {
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import { IconButton, Button } from "@/components/ui";
-import { FontAwesome } from "@expo/vector-icons";
+
 import { Dropdown } from "react-native-element-dropdown";
 import AttachFile from "../../../components/ui/AttachFile";
 import { useSelector } from "react-redux";
 import { MODULE_AUTH } from "../../../store/auth";
 import lists from "../../../utils/lists";
+import ImageUploader from "./../../../components/ui/ImageUploader";
 
 // Mock data for radio button groups
 const workingModels = ["Remote", "Hybrid", "On-Site"];
@@ -112,20 +113,13 @@ const ApplicantProfile = () => {
         <View className="p-4">
           {/* Profile Picture */}
           <View className="items-center mb-6">
-            <View className="relative">
-              <Image
-                // defaultSource={require("@/assets/images/avatar.png")}
-                source={{
-                  uri: "https://firebasestorage.googleapis.com/v0/b/findjob-e12bc.appspot.com/o/DocumentStore%2Fimage%206.png?alt=media&token=3f2e570b-ab3e-4dab-8997-f82be43f3790",
-                }}
-                className="w-24 h-24 rounded-full"
+            <View>
+              <ImageUploader
+                dataSource={lists.Users}
+                refId={currentUser?.Id}
+                imageUrlColumn="ImageUrl"
+                allowEdit
               />
-              <TouchableOpacity
-                className="absolute bottom-0 right-0 bg-primary rounded-full p-2"
-                onPress={() => console.log("Edit photo")}
-              >
-                <FontAwesome name="pencil" size={16} color="white" />
-              </TouchableOpacity>
             </View>
           </View>
 

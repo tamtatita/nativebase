@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Alert, Image } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import uuid from "react-native-uuid";
 import * as DocumentPicker from "expo-document-picker";
 import { FlashList } from "@shopify/flash-list";
@@ -12,11 +12,11 @@ import {
 import lists from "./../../utils/lists";
 import { useEffect } from "react";
 import { removeGuidFromFileName } from "../../utils/helpers";
-import { Button, Dialog, Modal, Paragraph, Portal } from "react-native-paper";
+import { Button, Dialog, Paragraph, Portal } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
 
 const propTypes = {
-  refId: PropTypes.string,
+  refId: PropTypes.number,
   dataSource: PropTypes.string,
 };
 const SERVERRELATIVEURL = "/DocumentStore";
@@ -38,6 +38,7 @@ const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
   const pickFiles = async () => {
     try {
       setLoadingState("upload");
+
       const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
 
       if (result.canceled) {
