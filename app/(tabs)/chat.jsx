@@ -7,29 +7,113 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FlashList } from "@shopify/flash-list";
 import { IconButton } from "@/components/ui";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { formatISOTOAgo } from "@/utils";
-import { Link, router } from "expo-router";
+import { Link, router, useFocusEffect } from "expo-router";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
+import lists from "./../../utils/lists";
+import { getItemsService } from "./../../utils/services";
+import { useDispatch, useSelector } from "react-redux";
+import { MODULE_AUTH } from "../../store/auth";
+import { USERTYPES } from "../../constants";
+import NoImage from "../../assets/images/no-image.png";
+import { setNewMessage } from "../../store/messagebox";
+import { useAuth } from "@/components/providers/AuthProvider";
+import config from "../../utils/config";
+
 const Chat = () => {
   const [dataChat, setDataChat] = useState([]);
+  const [joinChatCon, setJoinChatCon] = useState(null);
 
-  useEffect(() => {
-    const data = [];
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        id: i,
-        name: `Hello ${i}`,
-        message: `This is message ${i}`,
-        lastTime: "2024-09-25T13:34:10.249Z",
-        image_url:
-          "https://i.pinimg.com/736x/f6/79/8f/f6798f45b86b646e7e5e88696c5f220d.jpg",
-      });
+  const connRef = useRef(null); // Dùng useRef để lưu conn
+  const { profile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
+
+  const dispatch = useDispatch();
+
+  const handleBack = async () => {
+    try {
+      if (connRef.current) {
+        await connRef.current.stop();
+        console.log("Connection stopped successfully.");
+      } else {
+        console.log("No active connection to stop.");
+      }
+    } catch (error) {
+      console.error("Error stopping connection: ", error);
     }
-    setDataChat(data);
-  }, []);
+  };
+
+  const handleJoinChatReceiveMessage = async (effectDataChat) => {
+    const exsistDataChat = dataChat.find(
+      (item) => item.Id === effectDataChat.Id
+    );
+    if (exsistDataChat) {
+      setDataChat(
+        dataChat.map((item) =>
+          item.Id === effectDataChat.Id ? effectDataChat : item
+        )
+      );
+    } else {
+      setDataChat([...dataChat, effectDataChat]);
+    }
+  };
+
+  const joinChat = async (UserId = 1) => {
+    try {
+      const conn = new HubConnectionBuilder()
+        .withUrl(`${config.BASE_URL}/chatHub`)
+        .configureLogging(LogLevel.Information)
+        .build();
+
+      conn.on("JoinChatReceiveMessage", (resp) => {
+        handleJoinChatReceiveMessage(resp);
+      });
+
+      await conn.start();
+      await conn.invoke("JoinChat", { UserId });
+      connRef.current = conn;
+    } catch (error) {
+      console.error("Error joining chat: ", error);
+    }
+  };
+
+  const handleGetChat = async () => {
+    let filter = "";
+    if (currentUser?.userType === USERTYPES.Candidate) {
+      filter = `CandidateId eq ${currentUser?.id}`;
+    } else {
+      filter = `RecruiterId eq ${currentUser?.id}`;
+    }
+    const res = await getItemsService(lists.MessageBox, {
+      filter,
+      expand: "LastMessage,Recruiter,Candidate",
+    });
+    setDataChat(res.value);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      handleGetChat();
+      joinChat(currentUser?.id);
+      return () => {
+        handleBack(); //
+      };
+    }, [])
+  );
+
   const RenderHeader = () => {
     return (
       <View>
@@ -67,24 +151,33 @@ const Chat = () => {
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
-                onPress={() => router.push(`(auth)/chat/${item?.id}`)}
+                onPress={() => {
+                  dispatch(setNewMessage({}));
+                  router.push(
+                    `(auth)/chat?RecruiterId=${item.RecruiterId}&CandidateId=${item.CandidateId}`
+                  );
+                }}
                 className="flex flex-row items-start p-3 bg-white border-[1px] border-gray-200 mb-2 mx-4 rounded-md"
               >
                 <View>
                   <Image
-                    source={{ uri: item.image_url }}
+                    source={NoImage}
                     width={40}
                     height={40}
                     className="w-[40px] h-[40px] object-cover rounded-full"
                   />
                 </View>
                 <View className="flex-1 ml-3">
-                  <Text className="font-bold text-lg">{item?.name}</Text>
-                  <Text>{item?.message}</Text>
+                  <Text className="font-bold text-lg">
+                    {currentUser?.userType === USERTYPES.Candidate
+                      ? item?.Recruiter?.FullName
+                      : item?.Candidate?.FullName}
+                  </Text>
+                  <Text>{item?.LastMessage?.Message}</Text>
                 </View>
                 <View>
                   <Text className="text-gray-500 text-sm">
-                    {formatISOTOAgo(item?.lastTime || new Date())}
+                    {formatISOTOAgo(item?.LastMessage?.Created || new Date())}
                   </Text>
                 </View>
               </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { MODULE_AUTH } from "../../../store/auth";
 import lists from "../../../utils/lists";
 import ImageUploader from "./../../../components/ui/ImageUploader";
+import useAuth from "./../../../hooks/useAuth";
 
 // Mock data for radio button groups
 const workingModels = ["Remote", "Hybrid", "On-Site"];
@@ -51,7 +52,10 @@ const ApplicantProfile = () => {
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const { currentUser } = useSelector((state) => state[MODULE_AUTH]);
+  const { profile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
 
   // Error handling
   const showError = (field) => isSubmitted && !field;
@@ -116,7 +120,7 @@ const ApplicantProfile = () => {
             <View>
               <ImageUploader
                 dataSource={lists.Users}
-                refId={currentUser?.Id}
+                refId={currentUser?.id}
                 imageUrlColumn="ImageUrl"
                 allowEdit
               />
@@ -232,7 +236,7 @@ const ApplicantProfile = () => {
 
             <AttachFile
               dataSource={lists.Users.listName}
-              refId={currentUser?.Id}
+              refId={currentUser?.id}
             />
 
             {/* Update Button */}

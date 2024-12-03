@@ -22,6 +22,14 @@ const lists = {
     site: config.EHS_GEMBA_SITE,
     listName: "StoreRecords",
   },
+  Messages: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "Messages",
+  },
+  MessageBox: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "MessageBox",
+  },
 };
 
 export default lists;

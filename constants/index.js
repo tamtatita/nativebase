@@ -12,3 +12,8 @@ export const LOGIN_TYPES = {
   OFFICE365: "OFFICE365LOGINTYPE",
   MANUAL: "MANUALLOGINTYPE",
 };
+
+export const USERTYPES = {
+  Recruiter: "Recruiter",
+  Candidate: "Candidate",
+};

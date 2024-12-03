@@ -41,7 +41,16 @@ const IconButton = ({
           borderRadius: type === "back" ? 99 : 1,
         },
       ]}
-      onPress={type === "back" ? router.back : onPress}
+      onPress={
+        type === "back"
+          ? async () => {
+              if (onPress) {
+                await onPress();
+              }
+              router.back();
+            }
+          : onPress
+      }
     >
       {/* Render component icon */}
       {type === "back" ? (

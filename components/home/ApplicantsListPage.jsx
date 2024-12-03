@@ -4,7 +4,7 @@ import { FlashList } from "@shopify/flash-list";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import PropTypes from "prop-types";
 import { router } from "expo-router";
-
+import MaleImage from "@/assets/images/male-avatar.png";
 // Mock data for the people list
 
 const PersonItem = ({ item }) => (
@@ -15,7 +15,7 @@ const PersonItem = ({ item }) => (
     <Image
       source={{ uri: item.avatar }}
       className="w-12 h-12 rounded-full "
-      defaultSource={require("@/assets/images/avatar.png")}
+      defaultSource={MaleImage}
     />
     <View className="ml-3">
       <Text className="text-base font-semibold text-gray-900">{item.name}</Text>
