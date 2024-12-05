@@ -17,3 +17,8 @@ export const USERTYPES = {
   Recruiter: "Recruiter",
   Candidate: "Candidate",
 };
+
+export const GENDERS = {
+  MALE: "Male",
+  FEMALE: "Female",
+};

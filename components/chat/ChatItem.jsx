@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useMemo } from "react";
 import { formatISOTOAgo, formatISOToDateTime } from "@/utils";
 import PropTypes from "prop-types";
@@ -7,6 +7,7 @@ import MaleImage from "@/assets/images/male-avatar.png";
 import { useSelector } from "react-redux";
 import { MODULE_AUTH } from "@/store/auth";
 import { useAuth } from "../providers/AuthProvider";
+import { GENDERS } from "@/constants";
 const propTypes = {
   data: PropTypes.object,
 };
@@ -21,25 +22,49 @@ const ChatItem = ({ data }) => {
     [currentUser, data]
   );
 
+  const imageSrc = useMemo(() => {
+    if (data?.Sender?.ImageUrl) {
+      return { uri: data?.Sender?.ImageUrl };
+    }
+    return data?.Sender?.Gender === GENDERS.MALE ? MaleImage : FeMaleImage;
+  }, [data]);
+
+  if (data?.IsSystemMessage) {
+    return (
+      <View className="flex items-center justify-center mb-5">
+        <Text className="text-sm text-gray-500">
+          {data?.Recruiter?.FullName} has accepted the job application.
+        </Text>
+        <TouchableOpacity>
+          <Text className="text-primary">View detail</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View
       className={`w-full mb-5 flex ${
         !isMe ? "justify-end items-start" : "justify-start items-end"
       }`}
     >
-      <View className="max-w-[86%]">
+      <View className="max-w-[86%]  ">
         <View
-          className={`${
-            isMe ? "bg-primary text-white" : "bg-gray-200 text-slate-700"
-          } rounded-full w-fit p-3`}
+          className={`flex flex-row ${isMe ? "justify-end" : "justify-start"}`}
         >
-          <Text
+          <View
             className={`${
-              isMe ? "text-white" : "text-gray-800 text-right"
-            } font-semibold`}
+              isMe ? "bg-primary text-white" : "bg-gray-200 text-slate-700"
+            } rounded-full  p-3 `}
           >
-            {data?.Message}
-          </Text>
+            <Text
+              className={`${
+                isMe ? "text-white" : "text-gray-800 "
+              } font-semibold `}
+            >
+              {data?.Message}
+            </Text>
+          </View>
         </View>
 
         <View
@@ -49,7 +74,7 @@ const ChatItem = ({ data }) => {
         >
           <Image
             // source={{ uri: isMe ? user?.avatar : userChat?.avatar }}
-            source={MaleImage}
+            source={imageSrc}
             className="w-[35px] h-[35px] object-cover rounded-full"
           />
 

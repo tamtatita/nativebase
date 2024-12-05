@@ -1,6 +1,5 @@
 import {
-  ActivityIndicator,
-  ActivityIndicatorBase,
+  FlatList,
   Image,
   SafeAreaView,
   StyleSheet,
@@ -8,27 +7,22 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { IconButton } from "@/components/ui";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from "@/constants/Colors";
+
 import { Loading, ChatItem } from "@/components";
-import { FlashList } from "@shopify/flash-list";
+
 import Entypo from "@expo/vector-icons/Entypo";
-import { height } from "@/lib/InfoDevice";
+
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import config from "./../../../utils/config";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 
 import { useAuth } from "@/components/providers/AuthProvider";
+
+import { GENDERS } from "./../../../constants/index";
 import {
   addDataChat,
   initAsyncThunk,
@@ -36,6 +30,9 @@ import {
   sendMessageAsyncThunk,
   setMessageText,
 } from "../../../store/messagebox";
+
+import FeMaleImage from "@/assets/images/female-avatar.png";
+import MaleImage from "@/assets/images/male-avatar.png";
 
 const ChatDetail = () => {
   const connRef = useRef(null); // Dùng useRef để lưu conn
@@ -57,12 +54,16 @@ const ChatDetail = () => {
   const params = useLocalSearchParams();
   const dispatch = useDispatch();
 
-  const userChat = {
-    id: 1,
-    name: "Nguyễn Văn A",
-    avatar:
-      "https://i.pinimg.com/564x/42/d9/74/42d974eba6db85dd338662bb67d4b9b9.jpg",
-  };
+  const userChat = useMemo(() => {
+    return currentUser.id == params.RecruiterId ? candidate : recruiter;
+  }, [currentUser, params]);
+
+  const userChatImage = useMemo(() => {
+    if (userChat?.ImageUrl) {
+      return { uri: userChat?.ImageUrl };
+    }
+    return userChat?.Gender === GENDERS.MALE ? MaleImage : FeMaleImage;
+  }, [userChat]);
 
   const joinSpecifyBoxMessage = async (RecruiterId, CandidateId) => {
     try {
@@ -86,7 +87,6 @@ const ChatDetail = () => {
       console.error("Error joining chat: ", error);
     }
   };
-  console.log("messageBox", messageBox);
   const handleAfterSendMessage = async () => {
     try {
       await connRef.current.invoke("SendMessage", {
@@ -132,13 +132,6 @@ const ChatDetail = () => {
     }, [])
   );
 
-  // Cuộn đến cuối danh sách khi dữ liệu thay đổi
-  // useEffect(() => {
-  //   if (flashListRef.current && dataChat.length > 0) {
-  //     flashListRef.current.scrollToEnd({ animated: true });
-  //   }
-  // }, [dataChat]);
-
   const RenderHeader = memo(() => {
     return (
       <View>
@@ -150,16 +143,16 @@ const ChatDetail = () => {
             <View className="flex flex-row items-start gap-x-2">
               <View>
                 <Image
-                  source={{ uri: userChat.avatar }}
+                  source={userChatImage}
                   className="w-[40px] h-[40px] object-cover rounded-full"
                 />
               </View>
 
               <View>
                 <Text className="text-white font-bold text-lg">
-                  {userChat.name}
+                  {userChat.FullName}
                 </Text>
-                <Text className="text-white text-xs">Đang hoạt động</Text>
+                <Text className="text-white text-xs">Online</Text>
               </View>
             </View>
           </View>
@@ -188,7 +181,7 @@ const ChatDetail = () => {
         // style={{ height: height - 300 }}
         className="bg-white p-5 flex-1 flex flex-col rounded-tr-3xl rounded-tl-3xl"
       >
-        <FlashList
+        <FlatList
           inverted
           ref={flashListRef} // Tham chiếu đến FlashList
           scrollEnabled
@@ -199,7 +192,6 @@ const ChatDetail = () => {
           data={dataChat}
           renderItem={({ item }) => <ChatItem data={item} />}
           keyExtractor={(item) => item.Id || item.id}
-          estimatedItemSize={20}
         />
       </View>
     );
@@ -215,7 +207,7 @@ const ChatDetail = () => {
         <TextInput
           value={messageText}
           onChangeText={(text) => dispatch(setMessageText(text))}
-          placeholder="Nhập tin nhắn"
+          placeholder="Enter your message"
           className="flex-1 h-14 mr-4 bg-gray-100 rounded-md p-2"
         />
 
@@ -223,6 +215,7 @@ const ChatDetail = () => {
           icon={<Ionicons name="send" size={24} color="black" />}
           size="medium"
           classNames="rounded-full"
+          disabled={!messageText}
           onPress={() => dispatch(sendMessageAsyncThunk({ currentUser }))}
         />
       </View>

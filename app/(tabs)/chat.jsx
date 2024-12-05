@@ -25,11 +25,14 @@ import lists from "./../../utils/lists";
 import { getItemsService } from "./../../utils/services";
 import { useDispatch, useSelector } from "react-redux";
 import { MODULE_AUTH } from "../../store/auth";
-import { USERTYPES } from "../../constants";
+import { GENDERS, USERTYPES } from "../../constants";
 import NoImage from "../../assets/images/no-image.png";
 import { setNewMessage } from "../../store/messagebox";
 import { useAuth } from "@/components/providers/AuthProvider";
 import config from "../../utils/config";
+
+import FeMaleImage from "@/assets/images/female-avatar.png";
+import MaleImage from "@/assets/images/male-avatar.png";
 
 const Chat = () => {
   const [dataChat, setDataChat] = useState([]);
@@ -149,6 +152,14 @@ const Chat = () => {
           estimatedItemSize={20}
           data={dataChat}
           renderItem={({ item }) => {
+            const showUser =
+              currentUser?.userType === USERTYPES.Candidate
+                ? item?.Recruiter
+                : item?.Candidate;
+            const imageSrc =
+              showUser?.ImageUrl || showUser?.Gender === GENDERS.MALE
+                ? MaleImage
+                : FeMaleImage;
             return (
               <TouchableOpacity
                 onPress={() => {
@@ -161,7 +172,7 @@ const Chat = () => {
               >
                 <View>
                   <Image
-                    source={NoImage}
+                    source={imageSrc}
                     width={40}
                     height={40}
                     className="w-[40px] h-[40px] object-cover rounded-full"
@@ -169,9 +180,7 @@ const Chat = () => {
                 </View>
                 <View className="flex-1 ml-3">
                   <Text className="font-bold text-lg">
-                    {currentUser?.userType === USERTYPES.Candidate
-                      ? item?.Recruiter?.FullName
-                      : item?.Candidate?.FullName}
+                    {showUser?.FullName}
                   </Text>
                   <Text>{item?.LastMessage?.Message}</Text>
                 </View>

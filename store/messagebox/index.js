@@ -25,7 +25,7 @@ export const initAsyncThunk = createAsyncThunk(
       let [chats, messageBox, users] = await Promise.all([
         getItemsService(lists.Messages, {
           filter: `RecruiterId eq ${RecruiterId} and CandidateId eq ${CandidateId}`,
-          expand: "Sender",
+          expand: "Sender,Recruiter",
           orderby: "Id asc",
         }).then((res) => res.value),
         getItemsService(lists.MessageBox, {
@@ -118,10 +118,12 @@ const messsageBoxSlice = createSlice({
         state.recruiter = action.payload.recruiter;
         state.candidate = action.payload.candidate;
         state.newMessage = {};
+        state.messageText = "";
       })
       .addCase(sendMessageAsyncThunk.fulfilled, (state, action) => {
         state.newMessage = action.payload.newMessage;
         state.messageBox = action.payload.updateMessagebox;
+        state.messageText = "";
       });
   },
 });
