@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Searchbar } from "react-native-paper";

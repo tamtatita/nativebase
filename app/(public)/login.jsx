@@ -69,6 +69,7 @@ const Login = () => {
         timeClose: 2000,
       });
     } catch (error) {
+      console.log(error, "error");
       const message = handleError(error);
 
       if (message.indexOf("Incorrect") > -1) {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -15,31 +15,88 @@ import { FlashList } from "@shopify/flash-list";
 import { Formik } from "formik";
 import { Dropdown } from "react-native-element-dropdown";
 import * as Yup from "yup";
-import { updateListItemService } from "../../../utils/services";
+import {
+  getItemsService,
+  updateListItemService,
+} from "../../../utils/services";
 import lists from "../../../utils/lists";
 import { useAuth } from "../../../components/providers/AuthProvider";
+import { CRITERIATYPES } from "../../../constants";
+import { useFocusEffect } from "expo-router";
 export default function JobPostForm() {
+  const [workingModels, setWorkingModels] = useState([]);
+  const [jobTypes, setJobTypes] = useState([]);
+  const [experienceLevels, setExperienceLevels] = useState([]);
+  const [jobTitles, setJobTitles] = useState([]);
+
+  const init = useCallback(async () => {
+    const criteriasResp = await getItemsService(lists.Criterias).then(
+      (res) => res.value
+    );
+    setWorkingModels(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.WORKINGMODEL
+      )
+    );
+    setJobTypes(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.JOBTYPE
+      )
+    );
+    setExperienceLevels(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.EXPERIENCE
+      )
+    );
+    setJobTitles(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.JOBTITLE
+      )
+    );
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      init();
+    }, [])
+  );
+
+  console.log(workingModels, "workingModels");
   const { profile, setProfile } = useAuth();
   const currentUser = useMemo(() => {
     return profile?.user;
   }, [profile]);
 
-  console.log(currentUser, "currentUser");
   const handleSubmit = async (values) => {
     const dataSubmit = {
       ...values,
+      MinSalary: parseInt(values.MinSalary),
+      MaxSalary: parseInt(values.MaxSalary),
       RecruiterId: currentUser?.id,
     };
     console.log(dataSubmit, "dataSubmit");
+    const a = {
+      Locations: "Hồ Chí Minh",
+      MinSalary: 12000000,
+      MaxSalary: 13000000,
+      Description: "Develop and maintain software applications.",
+      Requirement: "C#, .NET, SQL",
+      WorkingModelId: 11,
+      JobTypeId: 9,
+      ExperienceId: 10,
+      JobTitleId: 7,
+      RecruiterId: 7,
+      ApplicantCount: 3,
+    };
     try {
-      await updateListItemService(lists.Jobs, currentUser?.id, dataSubmit);
+      await updateListItemService(lists.Jobs, currentUser?.id, a);
       Alert.alert(
         "Thông báo",
         "Job information saved successfully!",
         JSON.stringify(values)
       );
     } catch (error) {
-      console.log(error);
+      console.log(error, "error");
       Alert.alert("Thông báo", "An error occurred, please try again later!");
     }
   };
@@ -176,11 +233,9 @@ export default function JobPostForm() {
                 <Text style={styles.label}>Job Type</Text>
                 <Dropdown
                   style={styles.dropdown}
-                  data={[
-                    { label: "Toàn thời gian", value: "full-time" },
-                    { label: "Bán thời gian", value: "part-time" },
-                    { label: "Thực tập", value: "internship" },
-                  ]}
+                  data={jobTypes?.map((item) => {
+                    return { label: item.Title, value: item.Id };
+                  })}
                   placeholder="Select job type"
                   labelField="label"
                   valueField="value"
@@ -195,12 +250,9 @@ export default function JobPostForm() {
                 <Text style={styles.label}>Experience</Text>
                 <Dropdown
                   style={styles.dropdown}
-                  data={[
-                    { label: "Không yêu cầu", value: "none" },
-                    { label: "Dưới 1 năm", value: "<1" },
-                    { label: "1-3 năm", value: "1-3" },
-                    { label: "Trên 3 năm", value: ">3" },
-                  ]}
+                  data={experienceLevels?.map((item) => {
+                    return { label: item.Title, value: item.Id };
+                  })}
                   placeholder="Select experience"
                   labelField="label"
                   valueField="value"
@@ -215,11 +267,9 @@ export default function JobPostForm() {
                 <Text style={styles.label}>Job Title</Text>
                 <Dropdown
                   style={styles.dropdown}
-                  data={[
-                    { label: "Nhân viên IT", value: "it-staff" },
-                    { label: "Quản lý", value: "manager" },
-                    { label: "Trợ lý", value: "assistant" },
-                  ]}
+                  data={jobTitles?.map((item) => {
+                    return { label: item.Title, value: item.Id };
+                  })}
                   placeholder="Select job title"
                   labelField="label"
                   valueField="value"
@@ -234,11 +284,9 @@ export default function JobPostForm() {
                 <Text style={styles.label}>Working Model</Text>
                 <Dropdown
                   style={styles.dropdown}
-                  data={[
-                    { label: "Sáng", value: "morning" },
-                    { label: "Chiều", value: "afternoon" },
-                    { label: "Cả ngày", value: "full-day" },
-                  ]}
+                  data={workingModels?.map((item) => {
+                    return { label: item.Title, value: item.Id };
+                  })}
                   placeholder="Select working time"
                   labelField="label"
                   valueField="value"

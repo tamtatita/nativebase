@@ -3,15 +3,12 @@ import {
   View,
   StyleSheet,
   Text,
-  TouchableOpacity,
   SafeAreaView,
   ScrollView,
 } from "react-native";
-import Spinner from "react-native-loading-spinner-overlay";
 import { useState } from "react";
-import { router, Stack } from "expo-router";
+import { router } from "expo-router";
 import { Formik } from "formik";
-import * as yup from "yup";
 import { TitleHeader } from "@/components";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -25,7 +22,6 @@ import config from "@/utils/config";
 import { LOGIN_TYPES } from "../../constants";
 import { useAuth } from "@/components/providers/AuthProvider";
 const Register = () => {
-  const [loading, setLoading] = useState(false);
   const [openPass, setOpenPass] = useState({
     password: "false",
     confirmPassword: false,
@@ -73,15 +69,14 @@ const Register = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1">
-      <ScrollView className="flex-1">
+    <SafeAreaView className="flex-1 bg-wwhite">
+      <ScrollView className="flex-1 bg-white">
         <View style={styles.container}>
           {/* Tên tiêu đề */}
           <TitleHeader
-            title={"Tạo tài khoản"}
+            title={"Create an account"}
             desc={"Lorem import PropTypes from "}
           />
-
           <View className="flex flex-col ">
             <Formik
               validationSchema={signupValidationSchema}
@@ -91,7 +86,7 @@ const Register = () => {
               {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
                 <View className="flex flex-col mb-4">
                   <View>
-                    <InputLabel title={"Nhập email"} />
+                    <InputLabel title={"Enter Email"} />
                     <TextInput
                       onChangeText={handleChange("email")}
                       onBlur={handleBlur("email")}
@@ -107,7 +102,7 @@ const Register = () => {
                   </View>
 
                   <View>
-                    <InputLabel title={"Nhập mật khẩu"} />
+                    <InputLabel title={"Enter Password"} />
                     <View className="relative">
                       <TextInput
                         onChangeText={handleChange("password")}
@@ -135,7 +130,7 @@ const Register = () => {
                   </View>
 
                   <View>
-                    <InputLabel title={"Nhập lại mật khẩu"} />
+                    <InputLabel title={"Enter Re-Password"} />
                     <View className="relative">
                       <TextInput
                         onChangeText={handleChange("confirmPassword")}
@@ -171,7 +166,7 @@ const Register = () => {
                       onPress={handleSubmit}
                       className="mt-5"
                       type="full"
-                      title={"Đăng ký"}
+                      title={"Register"}
                     />
                   </View>
                 </View>
@@ -179,35 +174,15 @@ const Register = () => {
             </Formik>
           </View>
 
-          {/* Đăng nhập bằng tài khoản khác */}
-          <View className="flex items-center justify-center my-3">
-            <Text className="text-gray-500 text-[13px]">Hoặc đăng ký bằng</Text>
-            <View
-              className="flex flex-row items-center my-2"
-              style={{ display: "flex" }}
-            >
-              <IconButton
-                shape={"circle"}
-                icon={<AntDesign name="google" size={30} color="orange" />}
-              />
-
-              <IconButton
-                shape={"circle"}
-                icon={<Entypo name="facebook" size={30} color="blue" />}
-              />
-            </View>
-          </View>
-
           {/* Đã có tài khoản */}
-
           <View className="flex items-center flex-row justify-center ">
             <Text className="text-center text-gray-500 text-[13px]">
-              Bạn đã có tài khoản?
+              Do you have an account?
             </Text>
             <Button
               onPress={() => router.replace("/login")}
               type={"link"}
-              title={"Đăng nhập"}
+              title={"Login"}
             />
           </View>
         </View>

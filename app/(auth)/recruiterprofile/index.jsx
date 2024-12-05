@@ -18,16 +18,26 @@ import lists from "../../../utils/lists";
 import { Button } from "../../../components/ui";
 import { updateListItemService } from "../../../utils/services";
 import { router } from "expo-router";
+import { toCamelCaseKey } from "../../../utils/helpers";
 
 const RecruiterProfile = () => {
   const handleSubmit = async (values) => {
     const dataSubmit = {
       ...values,
       IsInputInformation: true,
+      UserType: "Recruiter",
     };
 
     try {
       await updateListItemService(lists.Users, currentUser?.id, dataSubmit);
+      const newUser = {
+        ...currentUser,
+        ...dataSubmit,
+      };
+      setProfile({
+        ...profile,
+        user: toCamelCaseKey(newUser),
+      });
       Alert.alert(
         "Thông báo",
         "Company information saved successfully!",
@@ -41,9 +51,6 @@ const RecruiterProfile = () => {
 
   const validationSchema = Yup.object({
     FullName: Yup.string().required("Company name is required."),
-    Email: Yup.string()
-      .email("Invalid email format")
-      .required("Company Email is required"),
     CompanyPhone: Yup.string().required("Phone is required."),
     CompanyDescription: Yup.string().required("Description is required."),
     CompanyAddress: Yup.string().required("Address is required."),
@@ -58,14 +65,13 @@ const RecruiterProfile = () => {
       <SafeAreaView />
       <Formik
         initialValues={{
-          CompanyName: "",
-          Email: "",
+          FullName: "",
           Phone: "",
           CompanyDescription: "",
           CompanyAddress: "",
         }}
         onSubmit={handleSubmit}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
       >
         {({
           handleChange,
@@ -84,25 +90,12 @@ const RecruiterProfile = () => {
             <TextInput
               style={styles.input}
               placeholder="Enter company name"
-              onChangeText={handleChange("CompanyName")}
-              onBlur={handleBlur("CompanyName")}
-              value={values.CompanyName}
+              onChangeText={handleChange("FullName")}
+              onBlur={handleBlur("FullName")}
+              value={values.FullName}
             />
-            {touched.CompanyName && errors.CompanyName && (
-              <Text style={styles.errorText}>{errors.CompanyName}</Text>
-            )}
-
-            {/* Tên công ty */}
-            <Text style={styles.label}>Company Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter company email"
-              onChangeText={handleChange("Email")}
-              onBlur={handleBlur("Email")}
-              value={values.Email}
-            />
-            {touched.Email && errors.Email && (
-              <Text style={styles.errorText}>{errors.Email}</Text>
+            {touched.FullName && errors.FullName && (
+              <Text style={styles.errorText}>{errors.FullName}</Text>
             )}
 
             {/* Số điện thoại */}

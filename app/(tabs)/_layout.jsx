@@ -44,8 +44,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
+          tabBarButton:
+            currentUser?.userType !== "Candidate" ? () => null : undefined,
           title: "Explore",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <FontAwesome5 name="map-marker-alt" color={color} size={24} />
           ),
         }}
@@ -53,10 +55,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="bookmark"
         options={{
-          tabBarButton: () => null,
-          tabBarStyle: { display: "none" },
+          tabBarButton:
+            currentUser?.userType !== "Candidate" ? () => null : undefined,
           title: "Bookmark",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <FontAwesome6 name="book-bookmark" size={24} color={color} />
           ),
         }}
@@ -66,7 +68,7 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: "Chat",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="chat-processing-outline"
               size={24}
@@ -79,22 +81,23 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <FontAwesome name="user-circle" size={24} color={color} />
           ),
         }}
       />
-      {currentUser?.userType !== "Candidate" && (
-        <Tabs.Screen
-          name="recruitmentlist"
-          options={{
-            title: "Recruitment",
-            tabBarIcon: ({ color, focused }) => (
-              <FontAwesome name="search-minus" size={24} color={color} />
-            ),
-          }}
-        />
-      )}
+
+      <Tabs.Screen
+        name="recruitmentlist"
+        options={{
+          tabBarButton:
+            currentUser?.userType === "Candidate" ? () => null : undefined,
+          title: "Recruitment",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="search-minus" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
