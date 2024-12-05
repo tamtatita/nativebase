@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   toastMessage: {
     color: "white",
     fontWeight: "bold",
-    fontSize: "16px",
+    fontSize: 16,
   },
 });
 export default Toast;

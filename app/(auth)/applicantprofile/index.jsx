@@ -1,28 +1,30 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import { TextInput } from "react-native-paper";
-import { IconButton, Button } from "@/components/ui";
+import { TextInput } from "react-native";
+import { IconButton } from "@/components/ui";
 
 import { Dropdown } from "react-native-element-dropdown";
 import AttachFile from "../../../components/ui/AttachFile";
-import { useSelector } from "react-redux";
-import { MODULE_AUTH } from "../../../store/auth";
 import lists from "../../../utils/lists";
 import ImageUploader from "./../../../components/ui/ImageUploader";
-import useAuth from "./../../../hooks/useAuth";
 
+import { router, useFocusEffect } from "expo-router";
+import { useAuth } from "./../../../components/providers/AuthProvider";
+import { useToast } from "./../../../hooks/useToast";
+import {
+  getItemsService,
+  updateListItemService,
+} from "../../../utils/services";
+import { CRITERIATYPES } from "../../../constants";
+import { toCamelCaseKey } from "../../../utils/helpers";
 // Mock data for radio button groups
-const workingModels = ["Remote", "Hybrid", "On-Site"];
-const jobTypes = ["Full Time", "Part Time", "Contract"];
-const experienceLevels = ["Entry", "Junior", "Mid-Level", "Senior"];
-const jobTitles = ["Developer", "Designer", "Manager", "Consultant"];
+
 const genders = [
   {
     label: "Male",
@@ -32,18 +34,21 @@ const genders = [
     label: "Female",
     value: "Female",
   },
-  {
-    label: "Other",
-    value: "Other",
-  },
 ];
 
 const ApplicantProfile = () => {
+  //Master state
+  const [workingModels, setWorkingModels] = useState([]);
+  const [jobTypes, setJobTypes] = useState([]);
+  const [experienceLevels, setExperienceLevels] = useState([]);
+  const [jobTitles, setJobTitles] = useState([]);
+
   // Form state
   const [name, setName] = useState("Esther Howard");
   const [phone, setPhone] = useState("603.555.0123");
   const [email, setEmail] = useState("example@gmail.com");
   const [gender, setGender] = useState("");
+  const [storeRecords, setStoreRecords] = useState([]);
 
   // Radio button states
   const [selectedWorkingModel, setSelectedWorkingModel] = useState("");
@@ -52,13 +57,14 @@ const ApplicantProfile = () => {
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const { profile } = useAuth();
+  const { profile, setProfile } = useAuth();
+  const { showToast } = useToast();
   const currentUser = useMemo(() => {
     return profile?.user;
   }, [profile]);
 
   // Error handling
-  const showError = (field) => isSubmitted && !field;
+  const showError = (field) => isSubmitted && (!field || field?.length === 0);
 
   // Radio button group component
   const RadioGroup = ({
@@ -76,18 +82,18 @@ const ApplicantProfile = () => {
       <View className="flex-row flex-wrap mb-1">
         {options.map((option) => (
           <TouchableOpacity
-            key={option}
+            key={option?.Id}
             onPress={() => onSelect(option)}
             className={`mr-2 mb-2 py-2 px-3 rounded-full ${
-              selected === option ? "bg-primary" : "bg-gray-200"
+              selected?.Id === option?.Id ? "bg-primary" : "bg-gray-200"
             }`}
           >
             <Text
               className={`${
-                selected === option ? "text-white" : "text-gray-800"
+                selected?.Id === option?.Id ? "text-white" : "text-gray-800"
               }`}
             >
-              {option}
+              {option.Title}
             </Text>
           </TouchableOpacity>
         ))}
@@ -98,11 +104,114 @@ const ApplicantProfile = () => {
     </View>
   );
 
-  const handleUpdate = () => {
-    // Validate and update logic here
-    setIsSubmitted(true);
-    console.log("Update profile");
+  const handleValidate = () => {
+    if (
+      !name ||
+      !phone ||
+      !email ||
+      !gender ||
+      !selectedWorkingModel?.Id ||
+      !selectedJobType?.Id ||
+      !selectedExperience?.Id ||
+      !selectedJobTitle?.Id ||
+      storeRecords?.length === 0
+    ) {
+      return false;
+    }
+    return true;
   };
+
+  const handleUpdate = async () => {
+    // Validate and update logic here
+    try {
+      setIsSubmitted(true);
+      const isSuccess = handleValidate();
+      if (!isSuccess) {
+        showToast({
+          message: "Please fill in all required fields",
+          type: "error",
+        });
+        return;
+      }
+      const updateData = {
+        FullName: name,
+        Phone: phone,
+        Email: email,
+        Gender: gender,
+        WorkingModelId: selectedWorkingModel?.Id || null,
+        JobTypeId: selectedJobType?.Id || null,
+        ExperienceId: selectedExperience?.Id || null,
+        JobTitleId: selectedJobTitle?.Id || null,
+        IsInputInformation: true,
+      };
+      await updateListItemService(lists.Users, currentUser?.id, updateData);
+      showToast({
+        message: "Profile updated successfully",
+        type: "success",
+        timeClose: 2000,
+      });
+      const newUser = {
+        ...currentUser,
+        ...updateData,
+      };
+      setProfile({
+        ...profile,
+        user: toCamelCaseKey(newUser),
+      });
+      router.push("/(tabs)");
+    } catch (error) {
+      console.log("Error updating profile", error);
+      showToast({
+        message: "Error updating profile",
+        type: "error",
+        timeClose: 2000,
+      });
+    }
+  };
+
+  const setInformation = useCallback(() => {
+    setName(currentUser?.fullName);
+    setPhone(currentUser?.phone);
+    setEmail(currentUser?.email);
+    setGender(currentUser?.gender);
+    setSelectedWorkingModel({ Id: currentUser?.workingModelId });
+    setSelectedJobType({ Id: currentUser?.jobTypeId });
+    setSelectedExperience({ Id: currentUser?.experienceId });
+    setSelectedJobTitle({ Id: currentUser?.jobTitleId });
+  }, [currentUser]);
+
+  const init = useCallback(async () => {
+    const criteriasResp = await getItemsService(lists.Criterias).then(
+      (res) => res.value
+    );
+    setWorkingModels(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.WORKINGMODEL
+      )
+    );
+    setJobTypes(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.JOBTYPE
+      )
+    );
+    setExperienceLevels(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.EXPERIENCE
+      )
+    );
+    setJobTitles(
+      criteriasResp?.filter(
+        (item) => item.CriteriaType === CRITERIATYPES.JOBTITLE
+      )
+    );
+  }, []);
+
+  useFocusEffect(useCallback(() => setInformation(), []));
+  useFocusEffect(
+    useCallback(() => {
+      init();
+    }, [])
+  );
 
   return (
     <SafeAreaView className="flex-1">
@@ -116,7 +225,7 @@ const ApplicantProfile = () => {
         </View>
         <View className="p-4">
           {/* Profile Picture */}
-          <View className="items-center mb-6">
+          <View className="items-center mb-6 ">
             <View>
               <ImageUploader
                 dataSource={lists.Users}
@@ -137,7 +246,7 @@ const ApplicantProfile = () => {
               <TextInput
                 value={name}
                 onChangeText={setName}
-                className="bg-gray-50 rounded-lg"
+                className="bg-gray-50 rounded-lg p-2"
               />
               {showError(name) && (
                 <Text className="text-red-500">Name is required</Text>
@@ -152,7 +261,7 @@ const ApplicantProfile = () => {
                 <TextInput
                   value={phone}
                   onChangeText={setPhone}
-                  className="flex-1 bg-gray-50 rounded-lg"
+                  className="flex-1 bg-gray-50 rounded-lg p-2"
                 />
                 {showError(phone) && (
                   <Text className="text-red-500">Phone number is required</Text>
@@ -168,7 +277,7 @@ const ApplicantProfile = () => {
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
-                className="bg-gray-50 rounded-lg"
+                className="bg-gray-50 rounded-lg p-2"
               />
               {showError(email) && (
                 <Text className="text-red-500">Email is required</Text>
@@ -235,9 +344,14 @@ const ApplicantProfile = () => {
             />
 
             <AttachFile
+              accpectType="application/pdf"
               dataSource={lists.Users.listName}
               refId={currentUser?.id}
+              setStore={setStoreRecords}
             />
+            {showError(storeRecords) && (
+              <Text className="text-red-500">CV is required</Text>
+            )}
 
             {/* Update Button */}
             <TouchableOpacity

@@ -30,6 +30,10 @@ const lists = {
     site: config.EHS_GEMBA_SITE,
     listName: "MessageBox",
   },
+  Criterias: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "Criterias",
+  },
 };
 
 export default lists;

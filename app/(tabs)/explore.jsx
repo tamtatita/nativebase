@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   listTitle: {
     textAlign: "center",
-    fontFamily: "InterSemi",
+    // fontFamily: "InterSemi",
     fontSize: 16,
     marginVertical: 5,
     marginBottom: 20,

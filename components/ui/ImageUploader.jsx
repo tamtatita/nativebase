@@ -1,6 +1,6 @@
 import { FontAwesome } from "@expo/vector-icons";
 import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -106,7 +106,6 @@ const ImageUploader = ({
   useEffect(() => {
     if (refId) fetchImage();
   }, [refId, dataSource]);
-
   return (
     <View className="relative ">
       <Image
@@ -135,4 +134,4 @@ const ImageUploader = ({
 };
 
 ImageUploader.propTypes = propTypes;
-export default ImageUploader;
+export default memo(ImageUploader);

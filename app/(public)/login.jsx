@@ -4,13 +4,10 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  Platform,
-  Alert,
   Image,
 } from "react-native";
-import Spinner from "react-native-loading-spinner-overlay";
 import { useState } from "react";
-import { router, Stack } from "expo-router";
+import { router } from "expo-router";
 import { Formik } from "formik";
 import { TitleHeader } from "@/components";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -19,10 +16,7 @@ import { Colors } from "@/constants/Colors";
 import InputLabel from "../../components/ui/InputLabel";
 import { loginValidationSchema } from "@/lib/validation";
 import { FIREBASE_AUTH } from "../../firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { handleSigninGoogle } from "../../utils/auth";
 import { useToast } from "../../hooks/useToast";
 import { getAuth, loginService } from "../../utils/services";
@@ -33,7 +27,6 @@ import { useAuth } from "../../components/providers/AuthProvider";
 import { handleError } from "../../utils/helpers";
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
   const [openPass, setOpenPass] = useState({
     password: "false",
   });
@@ -71,65 +64,34 @@ const Login = () => {
         JSON.stringify(newProfile)
       );
       setProfile(newProfile);
-      // showToast({
-      //   message: "Đăng nhập thành công",
-      //   type: "success",
-      //   timeClose: 2000,
-      // });
-      // const user = await signInWithEmailAndPassword(
-      //   auth,
-      //   values?.email,
-      //   values?.password
-      // );
-      // console.log(user, "user");
-      // if (user || true) {
-      //   showToast({
-      //     message: "Đăng nhập thành công",
-      //     type: "success",
-      //     timeClose: 2000,
-      //   });
-      //   if (
-      //     user.user.displayName === undefined ||
-      //     user.user.displayName === ""
-      //   ) {
-      //     console.log(user, "user");
-      //     router.replace("/complete");
-      //   }
-      //   // setTimeout(() => {
-      //   //   router.replace("(tabs)");
-      //   // }, 2000);
-      // } else {
-      //   showToast({
-      //     message: "Tài khoản hoặc mật khẩu không đúng",
-      //     type: "error",
-      //     timeClose: 2000,
-      //   });
-      // }
+      showToast({
+        message: "Login successfullly",
+        type: "success",
+        timeClose: 2000,
+      });
     } catch (error) {
       const message = handleError(error);
 
       if (message.indexOf("Incorrect") > -1) {
-        console.error("Thông tin đăng nhập chưa chính xác!");
+        showToast({
+          message: "Username or password is incorrect",
+          type: "error",
+          timeClose: 2000,
+        });
       } else {
-        console.error("Lỗi hệ thống, vui lòng thử lại trong giây lát!");
+        showToast({
+          message: "Login failed",
+          type: "error",
+          timeClose: 2000,
+        });
       }
-    }
-  };
-
-  const signUp = async () => {
-    try {
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      if (user) router.replace("/(tabs)");
-    } catch (error) {
-      console.log(error);
-      alert("Sign in failed: " + error.message);
     }
   };
 
   return (
     <View style={styles.container}>
       {/* Tên tiêu đề */}
-      <TitleHeader title={"Đăng nhập"} desc={"Lorem import PropTypes from "} />
+      <TitleHeader title={"Login"} desc={"Lorem import PropTypes from "} />
 
       <View className="flex flex-col ">
         <Formik
@@ -156,7 +118,7 @@ const Login = () => {
               </View>
 
               <View>
-                <InputLabel title={"Nhập mật khẩu"} />
+                <InputLabel title={"Enter password"} />
                 <View className="relative">
                   <TextInput
                     onChangeText={handleChange("password")}
@@ -187,7 +149,7 @@ const Login = () => {
                   onPress={handleSubmit}
                   className="mt-5"
                   type="full"
-                  title={"Đăng nhập"}
+                  title={"Login"}
                 />
               </View>
             </View>
@@ -197,7 +159,7 @@ const Login = () => {
 
       {/* Đăng nhập bằng tài khoản khác */}
       <View className="flex items-center justify-center my-3">
-        <Text className="text-gray-500 text-[13px]">Hoặc đăng nhập bằng</Text>
+        <Text className="text-gray-500 text-[13px]">Or login with</Text>
         <View className="flex flex-row items-center gap-6 my-2">
           <TouchableOpacity
             onPress={() => handleSigninGoogle()}
