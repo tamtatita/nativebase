@@ -2,6 +2,19 @@ import { router } from "expo-router";
 import React from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import PropTypes from "prop-types";
+
+const propTypes = {
+  shape: PropTypes.oneOf(["circle", "square", "roundedSquare"]),
+  color: PropTypes.string,
+  icon: PropTypes.element,
+  size: PropTypes.oneOf(["small", "medium", "large"]),
+  danger: PropTypes.bool,
+  onPress: PropTypes.func,
+  classNames: PropTypes.string,
+  type: PropTypes.string,
+};
+
 const IconButton = ({
   shape,
   color,
@@ -11,6 +24,7 @@ const IconButton = ({
   onPress,
   classNames,
   type,
+  ...rest
 }) => {
   // Chuyển đổi kích thước button dựa trên prop size
   const sizeStyle = {
@@ -41,7 +55,17 @@ const IconButton = ({
           borderRadius: type === "back" ? 99 : 1,
         },
       ]}
-      onPress={type === "back" ? router.back : onPress}
+      onPress={
+        type === "back"
+          ? async () => {
+              if (onPress) {
+                await onPress();
+              }
+              router.back();
+            }
+          : onPress
+      }
+      {...rest}
     >
       {/* Render component icon */}
       {type === "back" ? (
@@ -53,6 +77,7 @@ const IconButton = ({
   );
 };
 
+IconButton.propTypes = propTypes;
 export default IconButton;
 
 const styles = StyleSheet.create({

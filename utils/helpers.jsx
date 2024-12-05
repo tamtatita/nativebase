@@ -54,3 +54,23 @@ export const removeGuidFromFileName = (fileName) => {
   }
   return fileName;
 };
+
+const toPascalCase = (str) => {
+  return str
+    .replace(/([a-z])([A-Z])/g, "$1 $2") // Tách chữ cái hoa liền nhau
+    .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase()) // Xóa ký tự không phải chữ và viết hoa ký tự đầu
+    .replace(/^./, (chr) => chr.toUpperCase()); // Viết hoa ký tự đầu tiên
+};
+
+export const deepCapitalKeys = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(deepCapitalKeys); // Đệ quy cho mảng
+  } else if (obj !== null && typeof obj === "object") {
+    return Object.keys(obj).reduce((acc, key) => {
+      const capitalKey = toPascalCase(key);
+      acc[capitalKey] = deepCapitalKeys(obj[key]); // Đệ quy cho object lồng nhau
+      return acc;
+    }, {});
+  }
+  return obj; // Trả về giá trị nguyên bản nếu không phải object hoặc array
+};
