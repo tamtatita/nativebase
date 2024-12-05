@@ -22,3 +22,10 @@ export const GENDERS = {
   MALE: "Male",
   FEMALE: "Female",
 };
+
+export const CRITERIATYPES = {
+  JOBTITLE: "JobTitle",
+  JOBTYPE: "JobType",
+  WORKINGMODEL: "WorkingModel",
+  EXPERIENCE: "Experience",
+};

@@ -1,35 +1,28 @@
 import {
   FlatList,
-  Image,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback } from "react";
-import { Button, IconButton } from "../../components/ui";
-import { signOut } from "firebase/auth";
-import { FIREBASE_AUTH } from "../../firebase";
+import React, { useCallback, useMemo } from "react";
+import { IconButton } from "../../components/ui";
 import { FlashList } from "@shopify/flash-list";
-import { Progress } from "@ant-design/react-native";
-import {
-  Feather,
-  FontAwesome,
-  Ionicons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { router } from "expo-router";
 import { useAuth } from "../../components/providers/AuthProvider";
+import ImageUploader from "../../components/ui/ImageUploader";
+import lists from "../../utils/lists";
 
 const Profile = () => {
   const { logout } = useAuth();
-  const user = {
-    name: "John Doe",
-    image:
-      "https://i.pinimg.com/564x/b4/ce/50/b4ce504973a118b5c62a6f84a8be5cfa.jpg",
-  };
+
+  const { profile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
 
   const RenderProgress = useCallback(() => {
     return <View></View>;
@@ -42,23 +35,9 @@ const Profile = () => {
       link: "/(auth)/applicantprofile",
     },
     {
-      title: "Phân tích",
-      icon: <Ionicons name="analytics" size={30} color={Colors.primary} />,
-      link: "analyst",
-    },
-    {
       title: "Các đơn đã ứng tuyển",
       icon: <Feather name="book-open" size={30} color={Colors.primary} />,
       link: "jobApplied",
-    },
-    {
-      title: "Khóa ứng dụng",
-      icon: <Feather name="lock" size={30} color={Colors.primary} />,
-      link: "lockApp",
-    },
-    {
-      title: "Cài đặt",
-      icon: <Feather name="settings" size={30} color={Colors.primary} />,
     },
     {
       title: "Đăng xuất",
@@ -87,17 +66,18 @@ const Profile = () => {
                 {/* Thông tin user */}
                 <View className="bg-primary p-3 mx-5 rounded-xl flex flex-row my-5">
                   <View className="flex items-center justify-center mr-4">
-                    <Image
-                      className="w-12 h-12 rounded-full"
-                      source={{ uri: user.image }}
+                    <ImageUploader
+                      width={48}
+                      dataSource={lists.Users}
+                      refId={currentUser?.id}
+                      imageUrlColumn="ImageUrl"
+                      allowEdit={false}
                     />
                   </View>
                   <View className="flex items-center justify-center">
                     <Text className="font-bold text-lg text-white">
-                      {user.name}
+                      {currentUser.fullName}
                     </Text>
-
-                    <Text className="text-sm text-white">View Profile</Text>
                   </View>
 
                   <RenderProgress />

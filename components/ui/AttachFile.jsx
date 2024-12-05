@@ -18,9 +18,16 @@ import { FontAwesome } from "@expo/vector-icons";
 const propTypes = {
   refId: PropTypes.number,
   dataSource: PropTypes.string,
+  setStore: PropTypes.func,
+  accpectType: PropTypes.string,
 };
 const SERVERRELATIVEURL = "/DocumentStore";
-const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
+const AttachFile = ({
+  refId = 1,
+  dataSource = "DocumentStore",
+  setStore,
+  accpectType = "*/*",
+}) => {
   const [files, setFiles] = useState([]);
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false);
   const [selectedDeleteFile, setSelectedDeleteFile] = useState(null);
@@ -39,7 +46,9 @@ const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
     try {
       setLoadingState("upload");
 
-      const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
+      const result = await DocumentPicker.getDocumentAsync({
+        type: accpectType,
+      });
 
       if (result.canceled) {
         setLoadingState("");
@@ -93,6 +102,9 @@ const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
       });
 
       setFiles(files.value);
+      if (setStore) {
+        setStore(files.value);
+      }
     } catch (error) {
       console.log("Error getting files: ", error);
     } finally {
@@ -136,19 +148,17 @@ const AttachFile = ({ refId = 1, dataSource = "DocumentStore" }) => {
             <Text className="text-white font-bold">Pick Files</Text>
           )}
         </TouchableOpacity>
-
-        <View className="flex flex-col w-full">
-          {loadingState === "getFiles" ? (
-            <Text className="text-black">Loading...</Text>
-          ) : (
-            <FlashList
-              data={files}
-              estimatedItemSize={50} // Ước lượng kích thước item
-              renderItem={renderItem}
-              keyExtractor={(item, index) => index.toString()}
-              className="w-full"
-            />
-          )}
+        {loadingState === "getFiles" ? (
+          <Text className="text-black">Loading...</Text>
+        ) : null}
+        <View className="flex flex-col w-full ">
+          <FlashList
+            data={files}
+            estimatedItemSize={20} // Ước lượng kích thước item
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            className="w-full h-full"
+          />
         </View>
       </View>
       <Portal>

@@ -60,5 +60,6 @@ export const ToastProvider = ({ children }) => {
 
 // Hook để sử dụng toast ở các component khác
 export const useToast = () => {
-  return useContext(ToastContext);
+  const { showToast, showPromiseToast } = useContext(ToastContext);
+  return { showToast, showPromiseToast };
 };
