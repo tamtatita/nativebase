@@ -13,7 +13,7 @@ const USERTYPES = [
   },
   {
     Title: "Candidate",
-    Icon: "user",
+    Icon: "users",
   },
 ];
 function UserType() {
@@ -27,14 +27,13 @@ function UserType() {
     if (userType.Title === "Candidate") {
       router.push("/(auth)/applicantprofile");
     } else {
-      //bổ sung
-      // router.push("candidate");
+      router.push("/(auth)/recruiterprofile");
     }
   };
 
   return (
     <SafeAreaView className="flex-1 flex justify-center items-center bg-[#797979]">
-      <View className="h-1/2 w-5/6 px-4  flex flex-col justify-around bg-[#DCDCDE] shadow-sm">
+      <View className="h-1/2 w-5/6 px-4  flex flex-col justify-around bg-[#DCDCDE] shadow-sm rounded-xl">
         <View className="flex">
           <Text className="font-bold text-2xl">SELECT USER TYPE </Text>
           <View className="h-2 w-5 bg-primary rounded-sm"></View>
@@ -42,6 +41,7 @@ function UserType() {
         <View className="flex flex-row justify-center items-center gap-2">
           {USERTYPES.map((type) => (
             <TouchableOpacity
+              key={type.Title}
               className={`p-6 flex flex-col items-center rounded-lg ${
                 userType?.Title === type.Title
                   ? "bg-primary text-white"
@@ -51,14 +51,16 @@ function UserType() {
             >
               <FontAwesome
                 name={type.Icon}
-                size={24}
+                size={30}
                 color={
                   userType?.Title === type.Title ? "white" : Colors.primary
                 }
               />
               <Text
                 className={`${
-                  userType?.Title === type.Title ? "text-white" : null
+                  userType?.Title === type.Title
+                    ? "text-white font-bold text-lg"
+                    : null
                 }`}
               >
                 {type.Title}

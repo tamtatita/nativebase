@@ -7,7 +7,6 @@ import {
   Image,
 } from "react-native";
 import { useState } from "react";
-import { router } from "expo-router";
 import { Formik } from "formik";
 import { TitleHeader } from "@/components";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -25,12 +24,12 @@ import config from "../../utils/config";
 import { LOGIN_TYPES } from "../../constants";
 import { useAuth } from "../../components/providers/AuthProvider";
 import { handleError } from "../../utils/helpers";
+import { router } from "expo-router";
 
 const Login = () => {
   const [openPass, setOpenPass] = useState({
     password: "false",
   });
-  const auth = FIREBASE_AUTH;
   const { showToast } = useToast();
   const { setProfile } = useAuth();
   const handleOpenPass = (type) => {

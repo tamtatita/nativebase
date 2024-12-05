@@ -4,7 +4,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Searchbar } from "react-native-paper";
 import { IconButton } from "@/components/ui";
 import { JobItem } from "@/components";
-import { FontAwesome } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 const jobCategories = ["All", "Accountant", "BDM", "Content"];
@@ -47,7 +47,7 @@ const mockJobs = [
 ];
 
 export default function RecruitmentList() {
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = React.useState("All");
 
   const onChangeSearch = (query) => setSearchQuery(query);
@@ -59,11 +59,16 @@ export default function RecruitmentList() {
           <Text className="flex-1 text-xl font-bold text-center">
             Recruitment List
           </Text>
-          <IconButton
-            icon={<FontAwesome name="plus" size={24} />}
-            size={24}
+        </View>
+
+        <View className="flex items-end justify-end my-4">
+          <TouchableOpacity
+            className="bg-blue-600 px-4 py-2 rounded-md flex-row items-center gap-x-2"
             onPress={() => router.push("/(auth)/jobpostform/-1")}
-          />
+          >
+            <AntDesign name="plus" size={16} color="white" />
+            <Text className="text-white font-semibold text-lg">Create Job</Text>
+          </TouchableOpacity>
         </View>
 
         <Searchbar
