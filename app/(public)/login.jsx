@@ -15,10 +15,7 @@ import { Colors } from "@/constants/Colors";
 import InputLabel from "../../components/ui/InputLabel";
 import { loginValidationSchema } from "@/lib/validation";
 import { FIREBASE_AUTH } from "../../firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { handleSigninGoogle } from "../../utils/auth";
 import { useToast } from "../../hooks/useToast";
 import { getAuth, loginService } from "../../utils/services";
@@ -66,47 +63,26 @@ const Login = () => {
         JSON.stringify(newProfile)
       );
       setProfile(newProfile);
-      // showToast({
-      //   message: "Đăng nhập thành công",
-      //   type: "success",
-      //   timeClose: 2000,
-      // });
-      // const user = await signInWithEmailAndPassword(
-      //   auth,
-      //   values?.email,
-      //   values?.password
-      // );
-      // console.log(user, "user");
-      // if (user || true) {
-      //   showToast({
-      //     message: "Đăng nhập thành công",
-      //     type: "success",
-      //     timeClose: 2000,
-      //   });
-      //   if (
-      //     user.user.displayName === undefined ||
-      //     user.user.displayName === ""
-      //   ) {
-      //     console.log(user, "user");
-      //     router.replace("/complete");
-      //   }
-      //   // setTimeout(() => {
-      //   //   router.replace("(tabs)");
-      //   // }, 2000);
-      // } else {
-      //   showToast({
-      //     message: "Tài khoản hoặc mật khẩu không đúng",
-      //     type: "error",
-      //     timeClose: 2000,
-      //   });
-      // }
+      showToast({
+        message: "Login successfullly",
+        type: "success",
+        timeClose: 2000,
+      });
     } catch (error) {
       const message = handleError(error);
 
       if (message.indexOf("Incorrect") > -1) {
-        console.error("Thông tin đăng nhập chưa chính xác!");
+        showToast({
+          message: "Username or password is incorrect",
+          type: "error",
+          timeClose: 2000,
+        });
       } else {
-        console.error("Lỗi hệ thống, vui lòng thử lại trong giây lát!");
+        showToast({
+          message: "Login failed",
+          type: "error",
+          timeClose: 2000,
+        });
       }
     }
   };
@@ -114,7 +90,7 @@ const Login = () => {
   return (
     <View style={styles.container}>
       {/* Tên tiêu đề */}
-      <TitleHeader title={"Đăng nhập"} desc={"Lorem import PropTypes from "} />
+      <TitleHeader title={"Login"} desc={"Lorem import PropTypes from "} />
 
       <View className="flex flex-col ">
         <Formik
@@ -141,7 +117,7 @@ const Login = () => {
               </View>
 
               <View>
-                <InputLabel title={"Nhập mật khẩu"} />
+                <InputLabel title={"Enter password"} />
                 <View className="relative">
                   <TextInput
                     onChangeText={handleChange("password")}
@@ -172,7 +148,7 @@ const Login = () => {
                   onPress={handleSubmit}
                   className="mt-5"
                   type="full"
-                  title={"Đăng nhập"}
+                  title={"Login"}
                 />
               </View>
             </View>
@@ -182,7 +158,7 @@ const Login = () => {
 
       {/* Đăng nhập bằng tài khoản khác */}
       <View className="flex items-center justify-center my-3">
-        <Text className="text-gray-500 text-[13px]">Hoặc đăng nhập bằng</Text>
+        <Text className="text-gray-500 text-[13px]">Or login with</Text>
         <View className="flex flex-row items-center gap-6 my-2">
           <TouchableOpacity
             onPress={() => handleSigninGoogle()}

@@ -21,7 +21,7 @@ import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 
 import { useAuth } from "@/components/providers/AuthProvider";
-
+import { useToast } from "../../../hooks/useToast";
 import { GENDERS } from "./../../../constants/index";
 import {
   addDataChat,
@@ -33,6 +33,7 @@ import {
 
 import FeMaleImage from "@/assets/images/female-avatar.png";
 import MaleImage from "@/assets/images/male-avatar.png";
+import { FlashList } from "@shopify/flash-list";
 
 const ChatDetail = () => {
   const connRef = useRef(null); // Dùng useRef để lưu conn
@@ -47,6 +48,7 @@ const ChatDetail = () => {
     newMessage,
   } = useSelector((state) => state[MODULE_MESSAGEBOX]);
   const { profile } = useAuth();
+  const { showToast } = useToast();
   const currentUser = useMemo(() => {
     return profile.user;
   }, [profile]);
@@ -77,6 +79,13 @@ const ChatDetail = () => {
       });
 
       conn.on("SendMessageResp", (resp) => {
+        if (resp.SenderId != currentUser.id) {
+          showToast({
+            message: "New message",
+            type: "success",
+            timeClose: 2000,
+          });
+        }
         dispatch(addDataChat(resp));
       });
 
@@ -181,7 +190,7 @@ const ChatDetail = () => {
         // style={{ height: height - 300 }}
         className="bg-white p-5 flex-1 flex flex-col rounded-tr-3xl rounded-tl-3xl"
       >
-        <FlatList
+        <FlashList
           inverted
           ref={flashListRef} // Tham chiếu đến FlashList
           scrollEnabled

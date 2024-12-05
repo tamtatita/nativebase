@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export function handleError(error, from) {
   let message = "";
 
@@ -74,3 +76,18 @@ export const deepCapitalKeys = (obj) => {
   }
   return obj; // Trả về giá trị nguyên bản nếu không phải object hoặc array
 };
+
+export function toCamelCaseKey(obj) {
+  if (Array.isArray(obj)) {
+    // Nếu là mảng, áp dụng đệ quy cho từng phần tử
+    return obj.map(toCamelCaseKey);
+  } else if (obj && typeof obj === "object") {
+    // Nếu là object, áp dụng lodash camelCase cho key
+    return Object.keys(obj).reduce((result, key) => {
+      const camelKey = _.camelCase(key); // Sử dụng lodash để chuyển key sang camelCase
+      result[camelKey] = toCamelCaseKey(obj[key]); // Đệ quy nếu value là object hoặc array
+      return result;
+    }, {});
+  }
+  return obj;
+}

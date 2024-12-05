@@ -32,6 +32,9 @@ const lists = {
   Jobs: {
     site: config.EHS_GEMBA_SITE,
     listName: "Jobs",
+  Criterias: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "Criterias",
   },
 };
 
