@@ -45,7 +45,7 @@ const IconButton = ({
 
   return (
     <TouchableOpacity
-      className={`${classNames} `}
+      className={`${classNames}`}
       style={[
         styles.button,
         sizeStyle,
