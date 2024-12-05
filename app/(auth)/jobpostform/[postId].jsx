@@ -1,280 +1,323 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  StyleSheet,
+  TextInput,
+  Alert,
 } from "react-native";
-import { RadioButton, TextInput } from "react-native-paper";
+import { RadioButton } from "react-native-paper";
 import { IconButton } from "@/components/ui";
 import { FlashList } from "@shopify/flash-list";
-
+import { Formik } from "formik";
+import { Dropdown } from "react-native-element-dropdown";
+import * as Yup from "yup";
+import { updateListItemService } from "../../../utils/services";
+import lists from "../../../utils/lists";
+import { useAuth } from "../../../components/providers/AuthProvider";
 export default function JobPostForm() {
-  const [location, setLocation] = useState("");
-  const [salaryMin, setSalaryMin] = useState("");
-  const [salaryMax, setSalaryMax] = useState("");
-  const [selectedWorkingModel, setSelectedWorkingModel] = useState("");
-  const [selectedJobType, setSelectedJobType] = useState("");
-  const [selectedExperienceLevel, setSelectedExperienceLevel] = useState("");
-  const [selectedJobTitle, setSelectedJobTitle] = useState("");
-  const [applicantCount, setApplicantCount] = useState("");
-  const [description, setDescription] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { profile, setProfile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
 
-  const workingModels = ["On-Site", "Remote", "Hybrid"];
-  const jobTypes = ["Full-Time", "Part-Time", "Contract"];
-  const experienceLevels = ["Entry", "Mid", "Senior"];
-  const jobTitles = ["Developer", "Designer", "Product Manager"];
-
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-
-    if (
-      location &&
-      salaryMin &&
-      salaryMax &&
-      selectedWorkingModel &&
-      selectedJobType &&
-      selectedExperienceLevel &&
-      selectedJobTitle &&
-      applicantCount &&
-      description
-    ) {
-      console.log("Submit");
-      setIsSubmitted(false); // Reset submit state after successful submission
+  console.log(currentUser, "currentUser");
+  const handleSubmit = async (values) => {
+    const dataSubmit = {
+      ...values,
+      RecruiterId: currentUser?.id,
+    };
+    console.log(dataSubmit, "dataSubmit");
+    try {
+      await updateListItemService(lists.Jobs, currentUser?.id, dataSubmit);
+      Alert.alert(
+        "Thông báo",
+        "Job information saved successfully!",
+        JSON.stringify(values)
+      );
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Thông báo", "An error occurred, please try again later!");
     }
   };
 
-  const showError = (field) => isSubmitted && !field;
+  const validationSchema = Yup.object({
+    Locations: Yup.string().required("Location is required."),
+    MinSalary: Yup.number()
+      .required("Minimum salary is required.")
+      .min(0, "Minimum salary must be greater than or equal to 0."),
+    MaxSalary: Yup.number()
+      .required("Maximum salary is required.")
+      .min(
+        Yup.ref("MinSalary"),
+        "Maximum salary must be greater than minimum salary."
+      ),
+    Description: Yup.string().required("Description is required."),
+    Requirement: Yup.string().required("Requirement is required."),
+    JobTypeId: Yup.string().required("Job type is required."),
+    ExperienceId: Yup.string().required("Experience is required."),
+    JobTitleId: Yup.string().required("Job title is required."),
+    WorkingModelId: Yup.string().required("Working time is required."),
+  });
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <View className="flex-row items-center justify-between mb-4">
-          <IconButton type="back" />
-          <Text className="flex-1 text-xl font-bold text-center">
-            Recruitment List
-          </Text>
-        </View>
-
-        <View className="flex flex-col gap-3">
-          {/* Location Input */}
-          <View>
-            <Text className="mb-2">
-              Location <Text className="text-red-500">*</Text>
-            </Text>
-            <TextInput
-              placeholder="Enter location"
-              value={location}
-              onChangeText={setLocation}
-              className=" bg-gray-200"
-            />
-            {showError(location) && (
-              <Text className="text-red-500 mb-4">Location is required</Text>
-            )}
-          </View>
-
-          {/* Salary Input */}
-          <View>
-            <Text className="mb-2">
-              Salary Range <Text className="text-red-500">*</Text>
-            </Text>
-            <View className="flex-row justify-between mb-1">
-              <TextInput
-                placeholder="Min"
-                value={salaryMin}
-                onChangeText={setSalaryMin}
-                keyboardType="numeric"
-                className="bg-gray-200  flex-1 mr-2"
-              />
-              <TextInput
-                placeholder="Max"
-                value={salaryMax}
-                onChangeText={setSalaryMax}
-                keyboardType="numeric"
-                className="bg-gray-200  flex-1"
-              />
-            </View>
-            {showError(salaryMin) && (
-              <Text className="text-red-500 mb-1">
-                Minimum salary is required
-              </Text>
-            )}
-            {showError(salaryMax) && (
-              <Text className="text-red-500 mb-4">
-                Maximum salary is required
-              </Text>
-            )}
-          </View>
-
-          {/* Working Model */}
-          <View>
-            <Text className="mb-2">
-              Working Model <Text className="text-red-500">*</Text>
-            </Text>
-            <View className="flex-row mb-1">
-              {workingModels.map((model) => (
-                <TouchableOpacity
-                  key={model}
-                  onPress={() => setSelectedWorkingModel(model)}
-                  className={`mr-2 py-2 px-3 rounded-full ${
-                    selectedWorkingModel === model
-                      ? "bg-primary"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  <Text
-                    className={`${
-                      selectedWorkingModel === model
-                        ? "text-white"
-                        : "text-black"
-                    }`}
-                  >
-                    {model}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            {showError(selectedWorkingModel) && (
-              <Text className="text-red-500 mb-4">
-                Working model is required
-              </Text>
-            )}
-          </View>
-
-          {/* Job Type */}
-          <View>
-            <Text className="mb-2">
-              Job Type <Text className="text-red-500">*</Text>
-            </Text>
-            <View className="flex-row mb-1">
-              {jobTypes.map((type) => (
-                <TouchableOpacity
-                  key={type}
-                  onPress={() => setSelectedJobType(type)}
-                  className={`mr-2 py-2 px-3 rounded-full ${
-                    selectedJobType === type ? "bg-primary" : "bg-gray-200"
-                  }`}
-                >
-                  <Text
-                    className={`${
-                      selectedJobType === type ? "text-white" : "text-black"
-                    }`}
-                  >
-                    {type}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            {showError(selectedJobType) && (
-              <Text className="text-red-500 mb-4">Job type is required</Text>
-            )}
-          </View>
-
-          {/* Experience Level */}
-          <View>
-            <Text className="mb-2">
-              Level of Experience <Text className="text-red-500">*</Text>
-            </Text>
-            <View className="flex-row mb-1">
-              {experienceLevels.map((level) => (
-                <TouchableOpacity
-                  key={level}
-                  onPress={() => setSelectedExperienceLevel(level)}
-                  className={`mr-2 py-2 px-3 rounded-full ${
-                    selectedExperienceLevel === level
-                      ? "bg-primary"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  <Text
-                    className={`${
-                      selectedExperienceLevel === level
-                        ? "text-white"
-                        : "text-black"
-                    }`}
-                  >
-                    {level}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            {showError(selectedExperienceLevel) && (
-              <Text className="text-red-500 mb-4">
-                Experience level is required
-              </Text>
-            )}
-          </View>
-
-          {/* Job Title */}
-          <View>
-            <Text className="mb-2">
-              Job Title <Text className="text-red-500">*</Text>
-            </Text>
-            <FlashList
-              data={jobTitles}
-              renderItem={({ item }) => (
-                <View key={item} className="flex-row items-center mb-1">
-                  <RadioButton
-                    value={item}
-                    status={selectedJobTitle === item ? "checked" : "unchecked"}
-                    onPress={() => setSelectedJobTitle(item)}
-                  />
-                  <Text>{item}</Text>
-                </View>
-              )}
-            />
-            {showError(selectedJobTitle) && (
-              <Text className="text-red-500 mb-4">Job title is required</Text>
-            )}
-          </View>
-
-          {/* Applicant Count */}
-          <View>
-            <Text className="mb-2">
-              Applicant Count <Text className="text-red-500">*</Text>
-            </Text>
-            <TextInput
-              placeholder="Enter count"
-              value={applicantCount}
-              onChangeText={setApplicantCount}
-              keyboardType="numeric"
-              className="bg-gray-200  mb-1"
-            />
-            {showError(applicantCount) && (
-              <Text className="text-red-500 mb-4">
-                Applicant count is required
-              </Text>
-            )}
-          </View>
-
-          {/* Description */}
-          <View>
-            <Text className="mb-2">
-              Description <Text className="text-red-500">*</Text>
-            </Text>
-            <TextInput
-              placeholder="Enter job description"
-              value={description}
-              onChangeText={setDescription}
-              multiline
-              className="bg-gray-200 p-3 mb-1 h-24"
-            />
-            {showError(description) && (
-              <Text className="text-red-500 mb-4">Description is required</Text>
-            )}
-          </View>
-
-          {/* Submit Button */}
-          <TouchableOpacity
-            onPress={handleSubmit}
-            className="bg-primary py-3 rounded-lg items-center"
+    <FlashList
+      estimatedItemSize={1}
+      ListHeaderComponent={() => (
+        <View style={styles.container}>
+          <SafeAreaView />
+          <IconButton type="back" size="small" />
+          <Formik
+            initialValues={{
+              Locations: "",
+              MinSalary: "",
+              MaxSalary: "",
+              Description: "",
+              Requirement: "",
+              JobTypeId: "",
+              ExperienceId: "",
+              JobTitleId: "",
+              WorkingModelId: "",
+            }}
+            onSubmit={handleSubmit}
+            // validationSchema={validationSchema}
           >
-            <Text className="text-white font-bold text-lg">Post Job</Text>
-          </TouchableOpacity>
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+              setFieldValue,
+            }) => (
+              <View>
+                <Text style={styles.title}>Create Job</Text>
+
+                {/* Địa điểm */}
+                <Text style={styles.label}>Locations</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter locations"
+                  onChangeText={handleChange("Locations")}
+                  onBlur={handleBlur("Locations")}
+                  value={values.Locations}
+                />
+                {touched.Locations && errors.Locations && (
+                  <Text style={styles.errorText}>{errors.Locations}</Text>
+                )}
+
+                <View className="gap-4 flex flex-row">
+                  <View className="flex-1">
+                    {/* Lương tối thiểu */}
+                    <Text style={styles.label}>Min Salary</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter min salary"
+                      onChangeText={handleChange("MinSalary")}
+                      onBlur={handleBlur("MinSalary")}
+                      value={values.MinSalary}
+                      keyboardType="numeric"
+                    />
+                    {touched.MinSalary && errors.MinSalary && (
+                      <Text style={styles.errorText}>{errors.MinSalary}</Text>
+                    )}
+                  </View>
+
+                  <View className="flex-1">
+                    {/* Lương tối đa */}
+                    <Text style={styles.label}>Max Salary</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter max salary"
+                      onChangeText={handleChange("MaxSalary")}
+                      onBlur={handleBlur("MaxSalary")}
+                      value={values.MaxSalary}
+                      keyboardType="numeric"
+                    />
+                    {touched.MaxSalary && errors.MaxSalary && (
+                      <Text style={styles.errorText}>{errors.MaxSalary}</Text>
+                    )}
+                  </View>
+                </View>
+
+                {/* Mô tả */}
+                <Text style={styles.label}>Description</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Enter description"
+                  onChangeText={handleChange("Description")}
+                  onBlur={handleBlur("Description")}
+                  value={values.Description}
+                  multiline
+                />
+                {touched.Description && errors.Description && (
+                  <Text style={styles.errorText}>{errors.Description}</Text>
+                )}
+
+                {/* Yêu cầu */}
+                <Text style={styles.label}>Requirement</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Nhập yêu cầu"
+                  onChangeText={handleChange("Requirement")}
+                  onBlur={handleBlur("Requirement")}
+                  value={values.Requirement}
+                  multiline
+                />
+                {touched.Requirement && errors.Requirement && (
+                  <Text style={styles.errorText}>{errors.Requirement}</Text>
+                )}
+
+                {/* Loại công việc */}
+                <Text style={styles.label}>Job Type</Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  data={[
+                    { label: "Toàn thời gian", value: "full-time" },
+                    { label: "Bán thời gian", value: "part-time" },
+                    { label: "Thực tập", value: "internship" },
+                  ]}
+                  placeholder="Select job type"
+                  labelField="label"
+                  valueField="value"
+                  value={values.JobTypeId}
+                  onChange={(item) => setFieldValue("JobTypeId", item.value)}
+                />
+                {touched.JobTypeId && errors.JobTypeId && (
+                  <Text style={styles.errorText}>{errors.JobTypeId}</Text>
+                )}
+
+                {/* Kinh nghiệm */}
+                <Text style={styles.label}>Experience</Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  data={[
+                    { label: "Không yêu cầu", value: "none" },
+                    { label: "Dưới 1 năm", value: "<1" },
+                    { label: "1-3 năm", value: "1-3" },
+                    { label: "Trên 3 năm", value: ">3" },
+                  ]}
+                  placeholder="Select experience"
+                  labelField="label"
+                  valueField="value"
+                  value={values.ExperienceId}
+                  onChange={(item) => setFieldValue("ExperienceId", item.value)}
+                />
+                {touched.ExperienceId && errors.ExperienceId && (
+                  <Text style={styles.errorText}>{errors.ExperienceId}</Text>
+                )}
+
+                {/* Chức danh */}
+                <Text style={styles.label}>Job Title</Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  data={[
+                    { label: "Nhân viên IT", value: "it-staff" },
+                    { label: "Quản lý", value: "manager" },
+                    { label: "Trợ lý", value: "assistant" },
+                  ]}
+                  placeholder="Select job title"
+                  labelField="label"
+                  valueField="value"
+                  value={values.JobTitleId}
+                  onChange={(item) => setFieldValue("JobTitleId", item.value)}
+                />
+                {touched.JobTitleId && errors.JobTitleId && (
+                  <Text style={styles.errorText}>{errors.JobTitleId}</Text>
+                )}
+
+                {/* Thời gian làm việc */}
+                <Text style={styles.label}>Working Model</Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  data={[
+                    { label: "Sáng", value: "morning" },
+                    { label: "Chiều", value: "afternoon" },
+                    { label: "Cả ngày", value: "full-day" },
+                  ]}
+                  placeholder="Select working time"
+                  labelField="label"
+                  valueField="value"
+                  value={values.WorkingModelId}
+                  onChange={(item) =>
+                    setFieldValue("WorkingModelId", item.value)
+                  }
+                />
+                {touched.WorkingModelId && errors.WorkingModelId && (
+                  <Text style={styles.errorText}>{errors.WorkingModelId}</Text>
+                )}
+
+                <TouchableOpacity
+                  style={styles.submitButton}
+                  onPress={handleSubmit}
+                >
+                  <Text style={styles.submitButtonText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </Formik>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      )}
+    />
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: "600",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 16,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+  },
+  submitButton: {
+    backgroundColor: "#28A745",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 16,
+  },
+  dropdown_placeholder: {
+    fontSize: 16,
+    color: "#888",
+  },
+});
