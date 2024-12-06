@@ -1,24 +1,33 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { memo } from "react";
+import PropTypes from "prop-types";
 
-const CategoryItem = ({ data, currentIndex }) => {
+const propTypes = {
+  data: PropTypes.object,
+  currentIndex: PropTypes.number,
+  handleOnPressCriteria: PropTypes.func,
+};
+
+const CategoryItem = ({ data, selectedCriteria, handleOnPressCriteria }) => {
   return (
     <TouchableOpacity
       className={`px-4 py-3 rounded-full ${
-        currentIndex === data?.id ? "bg-primary" : "bg-white"
+        selectedCriteria?.Id === data?.Id ? "bg-primary" : "bg-white"
       } border-1 border-gray-400 mr-4 `}
+      onPress={() => handleOnPressCriteria(data)}
     >
       <Text
         className={`${
-          currentIndex === data?.id ? "text-white" : "text-primary"
+          selectedCriteria?.Id === data?.Id ? "text-white" : "text-primary"
         } font-semibold text-sm`}
       >
-        {data?.name}
+        {data?.Title}
       </Text>
     </TouchableOpacity>
   );
 };
 
-export default CategoryItem;
+CategoryItem.propTypes = propTypes;
+export default memo(CategoryItem);
 
 const styles = StyleSheet.create({});

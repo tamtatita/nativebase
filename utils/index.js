@@ -6,11 +6,11 @@ export const formatCurrencyRange = (range) => {
 
 export const formatCurrency = (amount) => {
   if (amount >= 1000000000) {
-    return (amount / 1000000000).toFixed(1).replace(/\.0$/, "") + " T";
+    return (amount / 1000000000).toFixed(1).replace(/\.0$/, "") + " B";
   } else if (amount >= 1000000) {
-    return (amount / 1000000).toFixed(1).replace(/\.0$/, "") + " Tr";
+    return (amount / 1000000).toFixed(1).replace(/\.0$/, "") + " M";
   } else if (amount >= 1000) {
-    return (amount / 1000).toFixed(0) + "k";
+    return (amount / 1000).toFixed(0) + "K";
   } else {
     return amount.toString();
   }

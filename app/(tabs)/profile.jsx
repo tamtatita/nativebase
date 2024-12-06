@@ -15,6 +15,9 @@ import { router } from "expo-router";
 import { useAuth } from "../../components/providers/AuthProvider";
 import ImageUploader from "../../components/ui/ImageUploader";
 import lists from "../../utils/lists";
+import FeMaleImage from "@/assets/images/female-avatar.png";
+import MaleImage from "@/assets/images/male-avatar.png";
+import { GENDERS } from "../../constants";
 
 const Profile = () => {
   const { logout } = useAuth();
@@ -23,6 +26,10 @@ const Profile = () => {
   const currentUser = useMemo(() => {
     return profile?.user;
   }, [profile]);
+
+  const defaultSource = useMemo(() => {
+    return currentUser?.gender === GENDERS.FEMALE ? FeMaleImage : MaleImage;
+  }, [currentUser]);
 
   const RenderProgress = useCallback(() => {
     return <View></View>;
@@ -72,11 +79,12 @@ const Profile = () => {
                       refId={currentUser?.id}
                       imageUrlColumn="ImageUrl"
                       allowEdit={false}
+                      defaultSource={defaultSource}
                     />
                   </View>
                   <View className="flex items-center justify-center">
                     <Text className="font-bold text-lg text-white">
-                      {currentUser.fullName}
+                      {currentUser?.fullName}
                     </Text>
                   </View>
 

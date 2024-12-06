@@ -158,7 +158,7 @@ const Login = () => {
       </View>
 
       {/* Đăng nhập bằng tài khoản khác */}
-      <View className="flex items-center justify-center my-3">
+      {/* <View className="flex items-center justify-center my-3">
         <Text className="text-gray-500 text-[13px]">Or login with</Text>
         <View className="flex flex-row items-center gap-6 my-2">
           <TouchableOpacity
@@ -181,19 +181,19 @@ const Login = () => {
             />
           </TouchableOpacity>
         </View>
-      </View>
+      </View> */}
 
       {/* Đã có tài khoản */}
 
       <View className="flex items-center flex-row justify-center ">
         <Text className="text-center text-gray-500 text-[13px]">
-          Bạn chưa có tài khoản?
+          Don't have an account?
         </Text>
         <Button
           danger
           onPress={() => router.replace("/register")}
           type={"link"}
-          title={"Đăng ký"}
+          title={"Register"}
         />
       </View>
     </View>

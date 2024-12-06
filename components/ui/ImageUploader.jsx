@@ -25,6 +25,7 @@ const propTypes = {
   dataSource: PropTypes.object,
   imageUrlColumn: PropTypes.string,
   allowEdit: PropTypes.bool,
+  defaultSource: PropTypes.any,
 };
 
 const ImageUploader = ({
@@ -33,6 +34,7 @@ const ImageUploader = ({
   dataSource = lists.Users,
   imageUrlColumn,
   allowEdit = true,
+  defaultSource = NoImage,
 }) => {
   const [item, setItem] = useState(null);
   const [loadingState, setLoadingState] = useState("");
@@ -110,7 +112,7 @@ const ImageUploader = ({
     <View className="relative ">
       <Image
         style={{ width: width, height: width }}
-        source={item?.downloadUrl ? { uri: item.downloadUrl } : NoImage}
+        source={item?.downloadUrl ? { uri: item.downloadUrl } : defaultSource}
         className=" rounded-full"
       />
 
