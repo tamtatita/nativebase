@@ -301,7 +301,7 @@ const ApplicantProfile = () => {
                 searchPlaceholder="Search..."
                 value={gender}
                 onChange={(item) => {
-                  setGender(item.gender);
+                  setGender(item.value);
                 }}
               />
             </View>

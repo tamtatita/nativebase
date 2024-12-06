@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { width } from "@/lib/InfoDevice";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Colors } from "@/constants/Colors";
@@ -7,7 +7,20 @@ import { IconButton } from "../ui";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { formatCurrencyRange } from "@/utils";
 import { Link, router } from "expo-router";
+import { useAuth } from "../providers/AuthProvider";
+import lists from "@/utils/lists";
+import { addListItemService, deleteListItemService } from "@/utils/services";
+
+import NoImage from "../../assets/images/no-image.png";
 const JobItem = ({ data, type }) => {
+  const [loading, setLoading] = useState(false);
+  const [currentBookmark, setCurrentBookmark] = useState(data?.bookmark);
+
+  const { profile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
+
   const RenderStatus = useCallback(() => {
     let color;
     let bg;
@@ -40,6 +53,35 @@ const JobItem = ({ data, type }) => {
       </View>
     );
   }, [data]);
+
+  useEffect(() => {
+    setCurrentBookmark(data?.bookmark);
+  }, [data]);
+
+  const handleOnPressBookmark = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (currentBookmark?.Id) {
+        await deleteListItemService(lists.Bookmarks, currentBookmark.Id);
+        setCurrentBookmark({});
+      } else {
+        const bookmark = {
+          UserId: currentUser?.id,
+          JobId: data?.id,
+        };
+        const bookmarkResp = await addListItemService(
+          lists.Bookmarks,
+          bookmark
+        );
+        setCurrentBookmark(bookmarkResp);
+      }
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentBookmark, currentUser, data]);
+
   return (
     <View
       style={{
@@ -59,7 +101,9 @@ const JobItem = ({ data, type }) => {
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-row items-center gap-2">
             <Image
-              source={{ uri: data?.image_company }}
+              source={
+                data?.image_company ? { uri: data?.image_company } : NoImage
+              }
               style={{ width: 40, height: 40, borderRadius: 20 }}
             />
             <View className="flex">
@@ -77,13 +121,18 @@ const JobItem = ({ data, type }) => {
                 size={"small"}
                 shape="circle"
                 color="transparent"
+                disabled={loading}
                 icon={
                   <Ionicons
-                    name="bookmark-outline"
+                    name={currentBookmark?.Id ? "bookmark" : "bookmark-outline"}
                     size={24}
-                    color={Colors.primary}
+                    color={Colors.yellow}
                   />
                 }
+                onPress={(e) => {
+                  e.stopPropagation();
+                  handleOnPressBookmark();
+                }}
               />
             </View>
           ) : (
@@ -121,11 +170,11 @@ const JobItem = ({ data, type }) => {
       {type !== "applied" && (
         <>
           {/* Divider */}
-          <View className="border-b my-4 border-gray-300 mt-3"></View>
+          <View className="border-b  border-gray-300 mt-3"></View>
           {/* Applicants view và mức lương */}
           <View className="flex flex-row items-center justify-between">
             <View>
-              <View className="flex flex-row -space-x-1 overflow-hidden">
+              {/* <View className="flex flex-row -space-x-1 overflow-hidden">
                 <Image
                   className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
                   src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -146,10 +195,12 @@ const JobItem = ({ data, type }) => {
                   src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                   alt=""
                 />
-              </View>
+              </View> */}
 
               <Text className="text-slate-500 font-semibold mt-2">
-                {data?.applicantsView} Applicants
+                {data?.applicantsView > 0
+                  ? `${data.applicantsView} Applicants`
+                  : "No Applicants"}
               </Text>
             </View>
 

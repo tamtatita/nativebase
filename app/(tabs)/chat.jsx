@@ -146,8 +146,11 @@ const Chat = () => {
   };
 
   const RenderBodyChat = memo(() => {
+    if (!dataChat?.length || dataChat.length === 0) {
+      return null;
+    }
     return (
-      <View className="mt-5">
+      <View className="mt-5 h-full">
         <FlashList
           estimatedItemSize={20}
           data={dataChat}
@@ -203,13 +206,13 @@ const Chat = () => {
         estimatedItemSize={20}
         ListHeaderComponent={() => {
           return (
-            <>
+            <View className="flex flex-col">
               {RenderHeader()}
 
-              <View className="bg-white rounded-tr-3xl rounded-tl-3xl mt-5">
+              <View className="bg-white rounded-tr-3xl rounded-tl-3xl mt-5 h-96">
                 <RenderBodyChat />
               </View>
-            </>
+            </View>
           );
         }}
       />

@@ -174,10 +174,29 @@ const Register = () => {
             </Formik>
           </View>
 
+          {/* Đăng nhập bằng tài khoản khác */}
+          {/* <View className="flex items-center justify-center my-3">
+            <Text className="text-gray-500 text-[13px]">Hoặc đăng ký bằng</Text>
+            <View
+              className="flex flex-row items-center my-2"
+              style={{ display: "flex" }}
+            >
+              <IconButton
+                shape={"circle"}
+                icon={<AntDesign name="google" size={30} color="orange" />}
+              />
+
+              <IconButton
+                shape={"circle"}
+                icon={<Entypo name="facebook" size={30} color="blue" />}
+              />
+            </View>
+          </View> */}
+
           {/* Đã có tài khoản */}
           <View className="flex items-center flex-row justify-center ">
             <Text className="text-center text-gray-500 text-[13px]">
-              Do you have an account?
+              Already have an account?
             </Text>
             <Button
               onPress={() => router.replace("/login")}
@@ -193,6 +212,7 @@ const Register = () => {
 
 const styles = StyleSheet.create({
   container: {
+    minHeight: "100%",
     flex: 1,
     justifyContent: "center",
     padding: 20,

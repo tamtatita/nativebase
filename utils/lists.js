@@ -37,6 +37,14 @@ const lists = {
     site: config.EHS_GEMBA_SITE,
     listName: "Criterias",
   },
+  Jobs: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "Jobs",
+  },
+  Bookmarks: {
+    site: config.EHS_GEMBA_SITE,
+    listName: "Bookmarks",
+  },
 };
 
 export default lists;
