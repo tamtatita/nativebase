@@ -29,3 +29,41 @@ export const CRITERIATYPES = {
   WORKINGMODEL: "WorkingModel",
   EXPERIENCE: "Experience",
 };
+
+export class SendEmailItem {
+  constructor(
+    ToEmails,
+    Subject,
+    Body,
+    TemplateId,
+    Replacements,
+    Attachments,
+    CcEmails,
+    BccEmails,
+    Priority,
+    SmtpAddress,
+    PortNumber,
+    EmailFrom,
+    Password,
+    IsTest = false,
+    RefId,
+    DataSource
+  ) {
+    this.ToEmails = ToEmails;
+    this.Subject = Subject;
+    this.Body = Body;
+    this.TemplateId = TemplateId;
+    this.Replacements = Replacements;
+    this.Attachments = Attachments;
+    this.CcEmails = CcEmails;
+    this.BccEmails = BccEmails;
+    this.Priority = Priority;
+    this.SmtpAddress = SmtpAddress;
+    this.PortNumber = PortNumber;
+    this.EmailFrom = EmailFrom;
+    this.Password = Password;
+    this.IsTest = IsTest;
+    this.RefId = RefId;
+    this.DataSource = DataSource;
+  }
+}

@@ -18,4 +18,8 @@ export default {
   addFolder: (site) => `${site}/_api/web/folders`,
   deleteFolder: (site, serverRelativeUrl) =>
     `${site}/_api/web/GetFolderByServerRelativeUrl('${serverRelativeUrl}')`,
+  bulkInsert: (listName) => `/api/${listName}/BulkInsert`,
+  bulkPatch: (listName) => `/api/${listName}/BulkPatch`,
+  bulkDelete: (listName) => `/api/${listName}/BulkDelete`,
+  sendMail: () => `/api/Email/send`,
 };
