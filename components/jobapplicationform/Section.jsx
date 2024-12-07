@@ -1,7 +1,12 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import PropTypes from "prop-types";
 import React from "react";
 import { Text, View } from "react-native";
 
+const propTypes = {
+  title: PropTypes.string.isRequired,
+  iconTitle: PropTypes.element.isRequired,
+  children: PropTypes.element.isRequired,
+};
 const Section = ({ title, iconTitle, children }) => {
   return (
     <View className="p-4 border border-gray-400 rounded-xl ">
@@ -14,4 +19,5 @@ const Section = ({ title, iconTitle, children }) => {
   );
 };
 
+Section.propTypes = propTypes;
 export default Section;

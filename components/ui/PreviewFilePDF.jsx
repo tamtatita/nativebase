@@ -1,7 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import React, { memo, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { Portal, Modal } from "react-native-paper";
 import { WebView } from "react-native-webview";
 import { removeGuidFromFileName } from "../../utils/helpers";
@@ -15,18 +15,17 @@ function PreviewFilePDF({ handleDismiss, file }) {
   const [pdfUrl, setPdfUrl] = useState("");
 
   useEffect(() => {
-    if (file?.downloadUrl) {
-      setPdfUrl(
-        `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
-          file?.downloadUrl
-        )}`
-      );
+    if (file) {
+      const url = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+        file?.downloadUrl
+      )}`;
+      setPdfUrl(url);
     }
   }, [file]);
 
-  console.log(pdfUrl);
-
-  if (!pdfUrl) return null;
+  if (!pdfUrl) {
+    return null;
+  }
 
   return (
     <Portal>
@@ -44,7 +43,16 @@ function PreviewFilePDF({ handleDismiss, file }) {
             />
           </View>
           <WebView
-            renderLoading={() => <Text>Loading...</Text>}
+            startInLoadingState={true}
+            // className="flex-1 "
+            renderLoading={() => {
+              return (
+                <ActivityIndicator
+                  className="absolute top-1/2 left-1/2"
+                  size="large"
+                />
+              );
+            }}
             source={{
               uri: pdfUrl,
             }}
