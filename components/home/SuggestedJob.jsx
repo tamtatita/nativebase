@@ -31,6 +31,8 @@ function SuggestedJob() {
 
     const suggestedJobsResp = await getItemsService(lists.Jobs, {
       filter,
+      orderBy: "Created desc",
+      top: 15,
       expand: `WorkingModel,JobType,Experience,JobTitle,Recruiter,Bookmarks($filter=UserId eq ${currentUser?.id}),JobApplications($count=true)`,
     });
     setSuggestedJobs(suggestedJobsResp.value);

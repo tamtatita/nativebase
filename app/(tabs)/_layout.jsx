@@ -8,6 +8,8 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { USERTYPES } from "@/constants";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function TabLayout() {
   const { profile } = useAuth();
@@ -29,8 +31,25 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="recruitmentlist"
+        options={{
+          tabBarButton:
+            currentUser?.userType === USERTYPES.Candidate
+              ? () => null
+              : undefined,
+          title: "Recruitment",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="search-minus" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
+          tabBarButton:
+            currentUser?.userType === USERTYPES.Recruiter
+              ? () => null
+              : undefined,
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
@@ -45,7 +64,9 @@ export default function TabLayout() {
         name="explore"
         options={{
           tabBarButton:
-            currentUser?.userType !== "Candidate" ? () => null : undefined,
+            currentUser?.userType !== USERTYPES.Candidate
+              ? () => null
+              : undefined,
           title: "Explore",
           tabBarIcon: ({ color }) => (
             <FontAwesome5 name="map-marker-alt" color={color} size={24} />
@@ -56,7 +77,9 @@ export default function TabLayout() {
         name="bookmark"
         options={{
           tabBarButton:
-            currentUser?.userType !== "Candidate" ? () => null : undefined,
+            currentUser?.userType !== USERTYPES.Candidate
+              ? () => null
+              : undefined,
           title: "Bookmark",
           tabBarIcon: ({ color }) => (
             <FontAwesome6 name="book-bookmark" size={24} color={color} />
@@ -78,23 +101,24 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="notification"
+        options={{
+          tabBarButton:
+            currentUser?.userType !== USERTYPES.Recruiter
+              ? () => null
+              : undefined,
+          title: "Notification",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="notifications-sharp" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => (
             <FontAwesome name="user-circle" size={24} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="recruitmentlist"
-        options={{
-          tabBarButton:
-            currentUser?.userType === "Candidate" ? () => null : undefined,
-          title: "Recruitment",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome name="search-minus" size={24} color={color} />
           ),
         }}
       />

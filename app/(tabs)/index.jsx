@@ -1,5 +1,5 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useCallback, useMemo, useState } from "react";
+import { SafeAreaView, TextInput, View } from "react-native";
+import React, { useCallback } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { IconButton } from "@/components/ui";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -43,7 +43,7 @@ const Index = () => {
   ];
   const RenderSearchTop = useCallback(() => {
     return (
-      <View className="bg-primary h-[240px] p-5 rounded-bl-3xl rounded-br-3xl">
+      <View className="bg-primary h-[200px] p-5 rounded-bl-3xl rounded-br-3xl">
         <SafeAreaView />
 
         {/* Location And Notifi BTN */}
@@ -67,7 +67,7 @@ const Index = () => {
           </View>
           <View className="flex items-center justify-center">
             <IconButton
-              onPress={() => router.push("/notification")}
+              onPress={() => router.push("/(tabs)/notification")}
               shape={"roundedSquare"}
               size={"small"}
               classNames={"rounded-xl"}
@@ -96,18 +96,6 @@ const Index = () => {
               </View>
             </View>
           </View>
-
-          {/* Filter BTN */}
-          <View className="flex items-center justify-center">
-            <IconButton
-              onPress={() => router.push("filter")}
-              shape={"roundedSquare"}
-              size={"medium"}
-              classNames={"rounded-xl"}
-              color="#eab308"
-              icon={<Ionicons name="options" size={24} color="white" />}
-            />
-          </View>
         </View>
       </View>
     );
@@ -134,5 +122,3 @@ const Index = () => {
 };
 
 export default Index;
-
-const styles = StyleSheet.create({});

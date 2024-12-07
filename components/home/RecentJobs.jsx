@@ -1,4 +1,4 @@
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import React, { memo, useCallback, useMemo, useState } from "react";
 import { CategoryItem, JobItem } from "@/components";
 import { useFocusEffect } from "expo-router";
@@ -6,12 +6,12 @@ import { getItemsService } from "@/utils/services";
 import lists from "@/utils/lists";
 import { useAuth } from "../providers/AuthProvider";
 import { CRITERIATYPES } from "@/constants";
+import { FlashList } from "@shopify/flash-list";
 
 export const convertDataToJobItem = (data) => {
   return {
     id: data?.Id,
     title: data?.JobTitle?.Title,
-    company: data?.Recruiter?.Title,
     image_company: data?.Recruiter?.ImageUrl,
     location: data?.Locations || "N/A",
     salary: [data?.MinSalary, data?.MaxSalary],
@@ -21,6 +21,7 @@ export const convertDataToJobItem = (data) => {
       data?.WorkingModel?.Title,
     ],
     applicantsView: data["JobApplications@odata.count"],
+    company: data?.Recruiter?.FullName,
     bookmark: data.Bookmarks[0],
     ...data,
   };
@@ -30,7 +31,6 @@ function RecentJobs() {
   const [selectedCriteria, setSelectedCriteria] = useState(allSelected);
   const [jobs, setJobs] = useState([]);
   const [criterias, setCriterias] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const { profile } = useAuth();
   const currentUser = useMemo(() => {
@@ -40,29 +40,32 @@ function RecentJobs() {
   const handleOnPressCriteria = useCallback((data) => {
     setSelectedCriteria(data);
     handleGetRecentJobs(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleGetRecentJobs = useCallback(async (selectedCriteria) => {
-    setLoading(true);
-    try {
-      let filter = "";
-      if (selectedCriteria?.Id !== -1) {
-        filter = `JobTitleId eq ${selectedCriteria?.Id} `;
+  const handleGetRecentJobs = useCallback(
+    async (selectedCriteria) => {
+      try {
+        let filter = "";
+        if (selectedCriteria?.Id !== -1) {
+          filter = `JobTitleId eq ${selectedCriteria?.Id} `;
+        }
+
+        const jobsResp = await getItemsService(lists.Jobs, {
+          filter,
+          expand: `WorkingModel,JobType,Experience,JobTitle,Recruiter,Bookmarks($filter=UserId eq ${currentUser?.id}),JobApplications($count=true)`,
+          orderBy: "Created desc",
+          top: 15,
+        });
+        // console.log(jobsResp.value);
+        setJobs(jobsResp.value);
+        return jobsResp;
+      } catch (error) {
+        console.log("handleGetRecentJobs -> error", error);
       }
-
-      const jobsResp = await getItemsService(lists.Jobs, {
-        filter,
-        expand: `WorkingModel,JobType,Experience,JobTitle,Recruiter,Bookmarks($filter=UserId eq ${currentUser?.id}),JobApplications($count=true)`,
-      });
-      // console.log(jobsResp.value);
-      setJobs(jobsResp.value);
-      return jobsResp;
-    } catch (error) {
-      console.log("handleGetRecentJobs -> error", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [currentUser?.id]
+  );
 
   const handleGetCriterias = useCallback(async () => {
     const criteriasResp = await getItemsService(lists.Criterias, {
@@ -85,7 +88,7 @@ function RecentJobs() {
         setJobs([]);
         setCriterias([]);
       };
-    }, [])
+    }, [handleGetRecentJobs, handleGetCriterias])
   );
 
   return (
@@ -97,8 +100,8 @@ function RecentJobs() {
 
       {/* Category */}
       {criterias.length > 0 && (
-        <View className="ml-5">
-          <FlatList
+        <View className="ml-5 min-h-[2px]">
+          <FlashList
             data={criterias}
             renderItem={({ item }) => (
               <CategoryItem
@@ -109,20 +112,25 @@ function RecentJobs() {
             )}
             keyExtractor={(item) => item.Id.toString()}
             horizontal
+            scrollEnabled={true}
             showsHorizontalScrollIndicator={false}
+            estimatedItemSize={1}
+            extraData={selectedCriteria}
           />
         </View>
       )}
 
-      <View className="ml-5 mt-5 h-100">
-        <FlatList
+      <View className="ml-5 mt-5 min-h-[2px]">
+        <FlashList
           data={jobs}
           renderItem={({ item }) => {
             const jobItem = convertDataToJobItem(item);
             return <JobItem data={jobItem} type="large" />;
           }}
+          extraData={selectedCriteria}
+          estimatedItemSize={1}
           keyExtractor={(item) => item.Id.toString()}
-          scrollEnabled={true}
+          scrollEnabled={false}
         />
       </View>
     </View>
