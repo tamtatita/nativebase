@@ -1,10 +1,4 @@
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useMemo } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { IconButton } from "@/components/ui";
@@ -125,5 +119,3 @@ const Notification = () => {
 };
 
 export default Notification;
-
-const styles = StyleSheet.create({});

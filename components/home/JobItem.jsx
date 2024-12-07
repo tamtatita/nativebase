@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { width } from "@/lib/InfoDevice";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -6,12 +6,19 @@ import { Colors } from "@/constants/Colors";
 import { IconButton } from "../ui";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { formatCurrencyRange } from "@/utils";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useAuth } from "../providers/AuthProvider";
 import lists from "@/utils/lists";
 import { addListItemService, deleteListItemService } from "@/utils/services";
 
 import NoImage from "../../assets/images/no-image.png";
+import PropTypes from "prop-types";
+
+const propTypes = {
+  data: PropTypes.object,
+  type: PropTypes.string,
+};
+
 const JobItem = ({ data, type }) => {
   const [loading, setLoading] = useState(false);
   const [currentBookmark, setCurrentBookmark] = useState(data?.bookmark);
@@ -221,6 +228,5 @@ const JobItem = ({ data, type }) => {
   );
 };
 
+JobItem.propTypes = propTypes;
 export default JobItem;
-
-const styles = StyleSheet.create({});

@@ -1,15 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Slot, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { handleError } from "@/utils/helpers";
 import { getAuth, refreshTokenService } from "@/utils/services";
 import config from "@/utils/config";
-import LoadingPage from "@/app/(public)/loadingpage";
 import { authActions } from "@/store/auth";
 import { useDispatch } from "react-redux";
+import { USERTYPES } from "@/constants";
+import PropTypes from "prop-types";
 
 const AuthContext = createContext(null);
-
+const propTypes = {
+  children: PropTypes.node,
+};
 const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loginType, setLoginType] = useState(null);
@@ -88,14 +91,18 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (profile && !isGettingUser) {
       if (profile?.user?.isInputInformation) {
-        router.replace("/(tabs)"); // Điều hướng về trang tabs sau khi fetch user
+        if (profile?.user?.userType === USERTYPES.Candidate) {
+          router.replace("/(tabs)"); // Điều hướng về trang tabs sau khi fetch user
+        } else {
+          router.replace("/(tabs)/recruitmentlist"); // Điều hướng về trang tabs sau khi fetch user
+        }
       } else {
         router.replace("/(auth)/usertype"); // Điều hướng về trang tabs sau khi fetch user
       }
     } else if (!profile && !isGettingUser) {
       router.replace("/(public)/login"); // Điều hướng về trang login nếu không có profile
     }
-  }, [profile, isGettingUser]);
+  }, [profile, isGettingUser, router]);
 
   return (
     <AuthContext.Provider
@@ -114,4 +121,5 @@ export function useAuth() {
   return { profile, logout, fetchUser, loginType, setProfile };
 }
 
+AuthProvider.propTypes = propTypes;
 export default AuthProvider;
