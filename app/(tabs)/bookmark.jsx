@@ -1,57 +1,107 @@
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Searchbar } from "react-native-paper";
-import { IconButton } from "@/components/ui";
 import { JobItem } from "@/components";
+import { getItemsService } from "@/utils/services";
+import { CRITERIATYPES } from "@/constants";
+import lists from "./../../utils/lists";
+import { useFocusEffect } from "expo-router";
+import { useAuth } from "./../../components/providers/AuthProvider";
+import { debounce } from "lodash";
 
-const jobCategories = ["All", "Accountant", "BDM", "Content"];
+const allSelected = { Id: -1, Title: "All" };
 
-const mockJobs = [
-  {
-    id: "1",
-    title: "React Developer",
-    company: "AmplifyAvenue",
-    image_company: "https://example.com/amplifyavenue-logo.png",
-    location: "Remote",
-    type: ["Full-Time", "Remote", "Mid-Senior Level"],
-    salary: [62000, 82000],
-    applicantsView: 52,
-    status: "pending",
-  },
-  {
-    id: "2",
-    title: "Accountant",
-    company: "QubitLink Software",
-    image_company: "https://example.com/qubitlink-logo.png",
-    location: "New York, NY",
-    type: ["Contract", "On-Site", "Associate"],
-    salary: [42000, 42000],
-    applicantsView: 52,
-    status: "sent",
-  },
-  {
-    id: "3",
-    title: "React Native Developer",
-    company: "YellowByte Innovations",
-    image_company: "https://example.com/yellowbyte-logo.png",
-    location: "San Francisco, CA",
-    type: ["Contract", "On-Site", "Associate"],
-    salary: [70000, 70000],
-    applicantsView: 52,
-    status: "accepted",
-  },
-  // Add more mock jobs as needed
-];
+const convertBookmarkToJob = (data) => {
+  return {
+    id: data?.JobId,
+    title: data?.Job?.JobTitle?.Title,
+    image_company: data?.Job?.Recruiter?.ImageUrl,
+    location: data?.Job?.Locations || "N/A",
+    salary: [data?.Job?.MinSalary, data?.Job?.MaxSalary],
+    type: [
+      data?.Job?.JobType?.Title,
+      data?.Job?.Experience?.Title,
+      data?.Job?.WorkingModel?.Title,
+    ],
+    applicantsView: data?.Job?.["JobApplications@odata.count"],
+    company: data?.Job?.Recruiter?.FullName,
+    bookmark: data,
+    ...data,
+  };
+};
 
 export default function BookMark() {
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCriteria, setSelectedCriteria] = useState(allSelected);
+  const [bookmarks, setBookmarks] = useState([]);
+  const [criterias, setCriterias] = useState([]);
 
-  const onChangeSearch = (query) => setSearchQuery(query);
+  const { profile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
+  const onChangeSearch = debounce((query) => {
+    handletGetBookmarks(selectedCriteria, query);
+    setSearchQuery(query);
+  }, 500);
+
+  const handletGetBookmarks = useCallback(
+    async (selectedCriteria, searchText) => {
+      try {
+        const conditions = [];
+        if (selectedCriteria?.Id !== -1) {
+          conditions.push(`Job/JobTitleId eq ${selectedCriteria?.Id}`);
+        }
+
+        if (searchText) {
+          conditions.push(
+            `(contains(Job/Locations, '${searchText}') or contains(Job/Recruiter/FullName, '${searchText}'))`
+          );
+        }
+        conditions.push(`UserId eq ${currentUser?.id}`);
+        let filter = conditions.join(" and ");
+        const jobsResp = await getItemsService(lists.Bookmarks, {
+          filter,
+          expand: `Job($expand=WorkingModel,JobType,Experience,JobTitle,Recruiter,JobApplications($count=true))`,
+          orderBy: "Created desc",
+          top: 15,
+        });
+        setBookmarks(jobsResp.value);
+        return jobsResp;
+      } catch (error) {
+        console.log("handletGetBookmarks -> error", error);
+      }
+    },
+    [currentUser?.id]
+  );
+
+  const handleGetCriterias = useCallback(async () => {
+    const criteriasResp = await getItemsService(lists.Criterias, {
+      filter: `CriteriaType eq '${CRITERIATYPES.JOBTITLE}'`,
+    }).then((res) => {
+      return res.value;
+    });
+    setCriterias([allSelected, ...criteriasResp]);
+    return criteriasResp;
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      handletGetBookmarks(allSelected);
+      handleGetCriterias();
+      setSelectedCriteria(allSelected);
+
+      return () => {
+        setSelectedCriteria(allSelected);
+        setBookmarks([]);
+        setCriterias([]);
+      };
+    }, [handletGetBookmarks, handleGetCriterias])
+  );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <SafeAreaView className="flex-1 flex flex-col  bg-gray-100">
       <View className="px-4 py-2 ">
         <View className="flex-row items-center justify-center mb-4">
           <Text className="text-xl font-bold">Bookmarks</Text>
@@ -59,38 +109,52 @@ export default function BookMark() {
         <Searchbar
           placeholder="Search jobs"
           onChangeText={onChangeSearch}
-          value={searchQuery}
+          defaultValue={searchQuery}
           className="mb-4"
         />
-        <FlashList
-          data={jobCategories}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => setSelectedCategory(item)}
-              className={`mr-2 px-4 py-2 rounded-full ${
-                selectedCategory === item ? "bg-blue-600" : "bg-gray-200"
-              }`}
-            >
-              <Text
-                className={`${
-                  selectedCategory === item ? "text-white" : "text-gray-800"
-                } font-semibold`}
+        <View className=" mb-2 ">
+          <FlashList
+            data={criterias}
+            extraData={selectedCriteria}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={async () => {
+                  setSelectedCriteria(item);
+                  await handletGetBookmarks(item);
+                }}
+                className={`mr-2 px-4 py-2 rounded-full ${
+                  selectedCriteria?.Id === item?.Id
+                    ? "bg-blue-600"
+                    : "bg-gray-200"
+                }`}
               >
-                {item} {/* Đảm bảo item nằm trong component <Text> */}
-              </Text>
-            </TouchableOpacity>
-          )}
-          horizontal
-          estimatedItemSize={20}
-          contentContainerStyle={{ paddingHorizontal: 4, marginBottom: 16 }}
-        />
+                <Text
+                  className={`${
+                    selectedCriteria?.Id === item?.Id
+                      ? "text-white"
+                      : "text-gray-800"
+                  } font-semibold`}
+                >
+                  {item?.Title} {/* Đảm bảo item nằm trong component <Text> */}
+                </Text>
+              </TouchableOpacity>
+            )}
+            horizontal
+            estimatedItemSize={20}
+          />
+        </View>
       </View>
-      <View className="flex-1 pt-4  ">
+
+      <View className="flex-1 px-4 min-h-[2px]">
         <FlashList
-          data={mockJobs}
-          renderItem={({ item }) => <JobItem data={item} type="large" />}
+          data={bookmarks}
+          renderItem={({ item }) => {
+            const jobItem = convertBookmarkToJob(item);
+            return <JobItem data={jobItem} type="large" />;
+          }}
           estimatedItemSize={20}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
+          keyExtractor={(item) => item.Id.toString()}
+          extraData={(selectedCriteria, searchQuery, bookmarks)}
         />
       </View>
     </SafeAreaView>
