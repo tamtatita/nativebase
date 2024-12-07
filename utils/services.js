@@ -293,3 +293,54 @@ export const updateListItemService = async (list, id, item) =>
     method: "patch",
   });
 // #endregion ListItem
+
+// #region Email
+export const sendEmailService = async (emailItem) =>
+  fetchAuth({
+    url: endpoints.sendMail(), // Match backend route
+    data: emailItem, // This should be a list of emails
+    method: "post",
+  });
+// #endregion Email
+
+// #region Bulk Insert, Patch, Delete
+//Lưu ý khi dùng bulkInsert, checkDataIsExsistService và bulkPatch. data trả về có thuộc tính là dạng camelCase.
+//Ví dụ UserName -> userName
+export const bulkInsertService = async (list, items) =>
+  fetchAuth({
+    url: endpoints.bulkInsert(list.listName),
+    data: items,
+    method: "post",
+  });
+
+//Lưu ý nếu có update thì phải truyền toàn bộ dữ liệu của item, không thể chỉ truyền những trường cần update.
+//Trả về 2 thuộc tính là inserted và updated
+export const bulkPatchService = async (list, items) =>
+  fetchAuth({
+    url: endpoints.bulkPatch(list.listName),
+    data: items,
+    method: "post",
+  });
+
+export const bulkDeleteService = async (list, items) =>
+  fetchAuth({
+    url: endpoints.bulkDelete(list.listName),
+    data: items,
+    method: "post",
+  });
+
+// #region Code mẫu email
+// try {
+//   const emailItem = {
+//     ToEmails: "quocthanh056@gmail.com",
+//     Subject: "Test send email",
+//     Body: "Test send email",
+//     IsTest: false,
+//     RefId: "1",
+//     DataSource: "1",
+//   };
+//   await sendEmailService(emailItem);
+// } catch (error) {
+//   console.log("error", error);
+// }
+// #endregion Code mẫu email
