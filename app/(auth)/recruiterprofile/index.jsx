@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,9 @@ import {
   Image,
   ScrollView,
   Alert,
+  FlatList,
 } from "react-native";
+import debounce from "lodash.debounce";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,9 +23,13 @@ import { router } from "expo-router";
 import { toCamelCaseKey } from "../../../utils/helpers";
 
 const RecruiterProfile = () => {
+  const [suggestions, setSuggestions] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [location, setLocation] = useState({});
   const handleSubmit = async (values) => {
     const dataSubmit = {
       ...values,
+      GeoLocation: String(location),
       IsInputInformation: true,
       UserType: "Recruiter",
     };
@@ -54,11 +60,58 @@ const RecruiterProfile = () => {
     CompanyPhone: Yup.string().required("Phone is required."),
     CompanyDescription: Yup.string().required("Description is required."),
     CompanyAddress: Yup.string().required("Address is required."),
+    GeoLocation: Yup.string().required("Location is required."),
   });
   const { profile, setProfile } = useAuth();
   const currentUser = useMemo(() => {
     return profile?.user;
   }, [profile]);
+
+  const fetchSuggestions = async (query) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          query
+        )}&format=json&addressdetails=1`
+      );
+      const data = await response.json();
+      setSuggestions(data.slice(0, 5)); // Giới hạn hiển thị 5 gợi ý
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      Alert.alert("Lỗi", "Không thể lấy danh sách gợi ý.");
+    }
+  };
+
+  // Sử dụng debounce để giảm số lần gọi API
+  const debouncedFetchSuggestions = useCallback(
+    debounce(fetchSuggestions, 500),
+    []
+  );
+  const handleSelectSuggestion = (item) => {
+    const { lat, lon, display_name } = item;
+    setLocation({
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    });
+    //  setMarker({
+    //    latitude: parseFloat(lat),
+    //    longitude: parseFloat(lon),
+    //    title: display_name,
+    //  });
+    setSuggestions([]);
+    setSearchQuery(display_name);
+  };
+
+  const handleInputChange = (text) => {
+    setSearchQuery(text);
+    debouncedFetchSuggestions(text); // Gọi hàm debounce
+  };
 
   return (
     <View style={styles.container}>
@@ -68,7 +121,7 @@ const RecruiterProfile = () => {
           FullName: "",
           Phone: "",
           CompanyDescription: "",
-          CompanyAddress: "",
+          GeoLocation: "",
         }}
         onSubmit={handleSubmit}
         // validationSchema={validationSchema}
@@ -82,7 +135,7 @@ const RecruiterProfile = () => {
           touched,
           setFieldValue,
         }) => (
-          <ScrollView>
+          <View>
             <Text style={styles.title}>Company Information</Text>
 
             {/* Tên công ty */}
@@ -112,18 +165,33 @@ const RecruiterProfile = () => {
               <Text style={styles.errorText}>{errors.Phone}</Text>
             )}
 
-            {/* Địa chỉ */}
-            <Text style={styles.label}>Company Address</Text>
+            {/* Vị trí */}
+            <Text style={styles.label}>Location</Text>
             <TextInput
-              style={styles.input}
-              placeholder="Enter company address"
-              onChangeText={handleChange("CompanyAddress")}
-              onBlur={handleBlur("CompanyAddress")}
-              value={values.CompanyAddress}
-              //   keyboardType="address-pad"
+              style={[styles.input]}
+              placeholder="Enter company description"
+              // onChangeText={handleChange("GeoLocation")}
+              onChangeText={handleInputChange}
+              onBlur={handleBlur("GeoLocation")}
+              value={searchQuery}
             />
-            {touched.CompanyAddress && errors.CompanyAddress && (
-              <Text style={styles.errorText}>{errors.CompanyAddress}</Text>
+            {touched.GeoLocation && errors.GeoLocation && (
+              <Text style={styles.errorText}>{errors.GeoLocation}</Text>
+            )}
+            {suggestions.length > 0 && (
+              <FlatList
+                data={suggestions}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.suggestionItem}
+                    onPress={() => handleSelectSuggestion(item)}
+                  >
+                    <Text>{item.display_name}</Text>
+                  </TouchableOpacity>
+                )}
+                style={styles.suggestionsList}
+              />
             )}
 
             {/* Mô tả */}
@@ -153,7 +221,7 @@ const RecruiterProfile = () => {
             </View>
 
             <Button type="full" title="SAVE" onPress={handleSubmit}></Button>
-          </ScrollView>
+          </View>
         )}
       </Formik>
     </View>
@@ -222,5 +290,18 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginBottom: 8,
+  },
+  suggestionsList: {
+    backgroundColor: "white",
+    maxHeight: 150,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  suggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
 });
