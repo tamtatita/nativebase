@@ -22,7 +22,7 @@ const mockJobs = [
     status: "pending",
   },
   {
-    id: "2",
+    id: "6",
     title: "Accountant",
     company: "QubitLink Software",
     image_company: "https://example.com/qubitlink-logo.png",
