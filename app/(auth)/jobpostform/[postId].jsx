@@ -8,26 +8,38 @@ import {
   StyleSheet,
   TextInput,
   Alert,
+  Button,
+  Platform,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { RadioButton } from "react-native-paper";
 import { IconButton } from "@/components/ui";
 import { FlashList } from "@shopify/flash-list";
-import { Formik } from "formik";
+import { Formik, useField } from "formik";
 import { Dropdown } from "react-native-element-dropdown";
 import * as Yup from "yup";
 import {
+  addListItemService,
   getItemsService,
   updateListItemService,
 } from "../../../utils/services";
 import lists from "../../../utils/lists";
 import { useAuth } from "../../../components/providers/AuthProvider";
 import { CRITERIATYPES } from "../../../constants";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+
+const OPTION_GENDER = [
+  { label: "Male", value: "male" },
+  { label: "Female", value: "female" },
+  { label: "Any", value: "any" },
+];
 export default function JobPostForm() {
   const [workingModels, setWorkingModels] = useState([]);
   const [jobTypes, setJobTypes] = useState([]);
   const [experienceLevels, setExperienceLevels] = useState([]);
   const [jobTitles, setJobTitles] = useState([]);
+
+  const [showPicker, setShowPicker] = useState(false);
 
   const init = useCallback(async () => {
     const criteriasResp = await getItemsService(lists.Criterias).then(
@@ -61,7 +73,6 @@ export default function JobPostForm() {
     }, [])
   );
 
-  console.log(workingModels, "workingModels");
   const { profile, setProfile } = useAuth();
   const currentUser = useMemo(() => {
     return profile?.user;
@@ -74,27 +85,14 @@ export default function JobPostForm() {
       MaxSalary: parseInt(values.MaxSalary),
       RecruiterId: currentUser?.id,
     };
-    console.log(dataSubmit, "dataSubmit");
-    const a = {
-      Locations: "Hồ Chí Minh",
-      MinSalary: 12000000,
-      MaxSalary: 13000000,
-      Description: "Develop and maintain software applications.",
-      Requirement: "C#, .NET, SQL",
-      WorkingModelId: 11,
-      JobTypeId: 9,
-      ExperienceId: 10,
-      JobTitleId: 7,
-      RecruiterId: 7,
-      ApplicantCount: 3,
-    };
     try {
-      await updateListItemService(lists.Jobs, currentUser?.id, a);
+      await addListItemService(lists.Jobs, dataSubmit);
       Alert.alert(
         "Thông báo",
         "Job information saved successfully!",
         JSON.stringify(values)
       );
+      router.back();
     } catch (error) {
       console.log(error, "error");
       Alert.alert("Thông báo", "An error occurred, please try again later!");
@@ -102,7 +100,7 @@ export default function JobPostForm() {
   };
 
   const validationSchema = Yup.object({
-    Locations: Yup.string().required("Location is required."),
+    Title: Yup.string().required("Title is required."),
     MinSalary: Yup.number()
       .required("Minimum salary is required.")
       .min(0, "Minimum salary must be greater than or equal to 0."),
@@ -120,6 +118,50 @@ export default function JobPostForm() {
     WorkingModelId: Yup.string().required("Working time is required."),
   });
 
+  // eslint-disable-next-line react/prop-types
+  const DateTimeField = ({ name }) => {
+    const [field, meta, helpers] = useField(name);
+    const [showPicker, setShowPicker] = useState(false);
+
+    return (
+      <View className="my-4">
+        {/* Nút để hiển thị DateTimePicker */}
+        <TouchableOpacity
+          className="bg-blue-500 text-white rounded-md px-3 py-1 "
+          onPress={() => setShowPicker(true)}
+        >
+          <Text className="text-white text-lg px-3 py-1 ">Pick Deadline</Text>
+        </TouchableOpacity>
+
+        {/* Hiển thị giá trị đã chọn */}
+        <Text className="text-lg">
+          Deadline: {field.value.toLocaleString()}
+        </Text>
+
+        {/* Hiển thị lỗi nếu có */}
+        {meta.touched && meta?.error && (
+          <Text style={{ color: "red" }}>{meta?.error}</Text>
+        )}
+
+        {/* DateTimePicker */}
+        {showPicker && (
+          <DateTimePicker
+            value={field?.value}
+            mode="datetime"
+            display={Platform.OS === "ios" ? "default" : "default"}
+            onChange={(event, selectedDate) => {
+              setShowPicker(false); // Ẩn picker sau khi chọn
+              if (selectedDate) {
+                console.log(selectedDate);
+                helpers.setValue(selectedDate);
+              }
+            }}
+          />
+        )}
+      </View>
+    );
+  };
+
   return (
     <FlashList
       estimatedItemSize={1}
@@ -129,7 +171,6 @@ export default function JobPostForm() {
           <IconButton type="back" size="small" />
           <Formik
             initialValues={{
-              Locations: "",
               MinSalary: "",
               MaxSalary: "",
               Description: "",
@@ -138,9 +179,14 @@ export default function JobPostForm() {
               ExperienceId: "",
               JobTitleId: "",
               WorkingModelId: "",
+              Title: "",
+              Quantity: 2,
+              Interest: "",
+              WorkingHours: "",
+              Deadline: new Date(),
             }}
             onSubmit={handleSubmit}
-            // validationSchema={validationSchema}
+            validationSchema={validationSchema}
           >
             {({
               handleChange,
@@ -154,18 +200,58 @@ export default function JobPostForm() {
               <View>
                 <Text style={styles.title}>Create Job</Text>
 
-                {/* Địa điểm */}
-                <Text style={styles.label}>Locations</Text>
+                {/* Mô tả */}
+                <Text style={styles.label}>Title</Text>
                 <TextInput
-                  style={styles.input}
-                  placeholder="Enter locations"
-                  onChangeText={handleChange("Locations")}
-                  onBlur={handleBlur("Locations")}
-                  value={values.Locations}
+                  style={[styles.input]}
+                  placeholder="Enter Title"
+                  onChangeText={handleChange("Title")}
+                  onBlur={handleBlur("Title")}
+                  value={values.Title}
+                  multiline
                 />
-                {touched.Locations && errors.Locations && (
-                  <Text style={styles.errorText}>{errors.Locations}</Text>
+                {touched.Title && errors.Title && (
+                  <Text style={styles.errorText}>{errors.Title}</Text>
                 )}
+
+                <View className="flex flex-row gap-4">
+                  <View className="flex-1">
+                    {/* Chức danh */}
+                    <Text style={styles.label}>Job Position</Text>
+                    <Dropdown
+                      style={styles.dropdown}
+                      data={jobTitles?.map((item) => {
+                        return { label: item.Title, value: item.Id };
+                      })}
+                      placeholder="Select job title"
+                      labelField="label"
+                      valueField="value"
+                      value={values.JobTitleId}
+                      onChange={(item) =>
+                        setFieldValue("JobTitleId", item.value)
+                      }
+                    />
+                    {touched.JobTitleId && errors.JobTitleId && (
+                      <Text style={styles.errorText}>{errors.JobTitleId}</Text>
+                    )}
+                  </View>
+
+                  <View className="flex-1">
+                    {/* Số lượng */}
+                    <Text style={styles.label}>Quantity</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter quantity"
+                      onChangeText={handleChange("Quantity")}
+                      onBlur={handleBlur("Quantity")}
+                      value={values.Quantity}
+                      keyboardType="numeric"
+                    />
+                    {touched.Quantity && errors.Quantity && (
+                      <Text style={styles.errorText}>{errors.Quantity}</Text>
+                    )}
+                  </View>
+                </View>
 
                 <View className="gap-4 flex flex-row">
                   <View className="flex-1">
@@ -201,6 +287,93 @@ export default function JobPostForm() {
                   </View>
                 </View>
 
+                <View className="flex flex-row gap-4">
+                  <View className="flex-1">
+                    {/* Loại công việc */}
+                    <Text style={styles.label}>Job Type</Text>
+                    <Dropdown
+                      style={styles.dropdown}
+                      data={jobTypes?.map((item) => {
+                        return { label: item.Title, value: item.Id };
+                      })}
+                      placeholder="Select job type"
+                      labelField="label"
+                      valueField="value"
+                      value={values.JobTypeId}
+                      onChange={(item) =>
+                        setFieldValue("JobTypeId", item.value)
+                      }
+                    />
+                    {touched.JobTypeId && errors.JobTypeId && (
+                      <Text style={styles.errorText}>{errors.JobTypeId}</Text>
+                    )}
+                  </View>
+                  <View className="flex-1">
+                    {/* Kinh nghiệm */}
+                    <Text style={styles.label}>Experience</Text>
+                    <Dropdown
+                      style={styles.dropdown}
+                      data={experienceLevels?.map((item) => {
+                        return { label: item.Title, value: item.Id };
+                      })}
+                      placeholder="Select experience"
+                      labelField="label"
+                      valueField="value"
+                      value={values.ExperienceId}
+                      onChange={(item) =>
+                        setFieldValue("ExperienceId", item.value)
+                      }
+                    />
+                    {touched.ExperienceId && errors.ExperienceId && (
+                      <Text style={styles.errorText}>
+                        {errors.ExperienceId}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+
+                <View className="gap-4 flex flex-row">
+                  <View className="flex-1">
+                    {/* Thời gian làm việc */}
+                    <Text style={styles.label}>Working Model</Text>
+                    <Dropdown
+                      style={styles.dropdown}
+                      data={workingModels?.map((item) => {
+                        return { label: item.Title, value: item.Id };
+                      })}
+                      placeholder="Select working time"
+                      labelField="label"
+                      valueField="value"
+                      value={values.WorkingModelId}
+                      onChange={(item) =>
+                        setFieldValue("WorkingModelId", item.value)
+                      }
+                    />
+                    {touched.WorkingModelId && errors.WorkingModelId && (
+                      <Text style={styles.errorText}>
+                        {errors.WorkingModelId}
+                      </Text>
+                    )}
+                  </View>
+
+                  <View className="flex-1">
+                    {/* Giới tính */}
+                    <Text style={styles.label}>Gender</Text>
+                    <Dropdown
+                      style={styles.dropdown}
+                      data={OPTION_GENDER}
+                      placeholder="Select gender"
+                      labelField="label"
+                      valueField="value"
+                      value={values.Gender}
+                      onChange={(item) => setFieldValue("Gender", item.value)}
+                    />
+                    {touched.Gender && errors.Gender && (
+                      <Text style={styles.errorText}>{errors.Gender}</Text>
+                    )}
+                  </View>
+                </View>
+
                 {/* Mô tả */}
                 <Text style={styles.label}>Description</Text>
                 <TextInput
@@ -229,75 +402,35 @@ export default function JobPostForm() {
                   <Text style={styles.errorText}>{errors.Requirement}</Text>
                 )}
 
-                {/* Loại công việc */}
-                <Text style={styles.label}>Job Type</Text>
-                <Dropdown
-                  style={styles.dropdown}
-                  data={jobTypes?.map((item) => {
-                    return { label: item.Title, value: item.Id };
-                  })}
-                  placeholder="Select job type"
-                  labelField="label"
-                  valueField="value"
-                  value={values.JobTypeId}
-                  onChange={(item) => setFieldValue("JobTypeId", item.value)}
+                {/* Quyền lợi */}
+                <Text style={styles.label}>Interest</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Enter interest"
+                  onChangeText={handleChange("Interest")}
+                  onBlur={handleBlur("Interest")}
+                  value={values.Interest}
+                  multiline
                 />
-                {touched.JobTypeId && errors.JobTypeId && (
-                  <Text style={styles.errorText}>{errors.JobTypeId}</Text>
-                )}
-
-                {/* Kinh nghiệm */}
-                <Text style={styles.label}>Experience</Text>
-                <Dropdown
-                  style={styles.dropdown}
-                  data={experienceLevels?.map((item) => {
-                    return { label: item.Title, value: item.Id };
-                  })}
-                  placeholder="Select experience"
-                  labelField="label"
-                  valueField="value"
-                  value={values.ExperienceId}
-                  onChange={(item) => setFieldValue("ExperienceId", item.value)}
-                />
-                {touched.ExperienceId && errors.ExperienceId && (
-                  <Text style={styles.errorText}>{errors.ExperienceId}</Text>
-                )}
-
-                {/* Chức danh */}
-                <Text style={styles.label}>Job Title</Text>
-                <Dropdown
-                  style={styles.dropdown}
-                  data={jobTitles?.map((item) => {
-                    return { label: item.Title, value: item.Id };
-                  })}
-                  placeholder="Select job title"
-                  labelField="label"
-                  valueField="value"
-                  value={values.JobTitleId}
-                  onChange={(item) => setFieldValue("JobTitleId", item.value)}
-                />
-                {touched.JobTitleId && errors.JobTitleId && (
-                  <Text style={styles.errorText}>{errors.JobTitleId}</Text>
+                {touched.Interest && errors.Interest && (
+                  <Text style={styles.errorText}>{errors.Interest}</Text>
                 )}
 
                 {/* Thời gian làm việc */}
-                <Text style={styles.label}>Working Model</Text>
-                <Dropdown
-                  style={styles.dropdown}
-                  data={workingModels?.map((item) => {
-                    return { label: item.Title, value: item.Id };
-                  })}
-                  placeholder="Select working time"
-                  labelField="label"
-                  valueField="value"
-                  value={values.WorkingModelId}
-                  onChange={(item) =>
-                    setFieldValue("WorkingModelId", item.value)
-                  }
+                <Text style={styles.label}>Working Time</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Enter Working time"
+                  onChangeText={handleChange("WorkingHours")}
+                  onBlur={handleBlur("WorkingHours")}
+                  value={values.WorkingHours}
+                  multiline
                 />
-                {touched.WorkingModelId && errors.WorkingModelId && (
-                  <Text style={styles.errorText}>{errors.WorkingModelId}</Text>
+                {touched.WorkingHours && errors.WorkingHours && (
+                  <Text style={styles.errorText}>{errors.WorkingHours}</Text>
                 )}
+
+                <DateTimeField name="Deadline" />
 
                 <TouchableOpacity
                   style={styles.submitButton}
@@ -319,6 +452,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 16,
+    paddingBottom: 46,
   },
   title: {
     fontSize: 24,
@@ -350,7 +484,7 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 26,
   },
   errorText: {
     color: "red",
