@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -22,6 +22,9 @@ import { removeGuidFromFileName } from "../../../utils/helpers";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useToast } from "../../../hooks/useToast";
 import { Button, Dialog, Paragraph, Portal } from "react-native-paper";
+import { JOBAPPLICATIONSTATUS } from "@/constants";
+import { USERTYPES } from "@/constants";
+import { useAuth } from "../../../components/providers/AuthProvider";
 
 const JobApplicationForm = () => {
   // Dữ liệu mặc định của ứng viên từ tài khoản đăng nhập
@@ -29,7 +32,7 @@ const JobApplicationForm = () => {
   // State cho thông tin mô tả và CV chọn
   const [description, setDescription] = useState("");
   const [selectedCV, setSelectedCV] = useState({});
-  const [currentUser, setCurrentUser] = useState({});
+  const [currentCandidate, setCurrentCandidate] = useState({});
   const [isSubmmited, setIsSubmmited] = useState(false);
   const [storeRecords, setStoreRecords] = useState([]);
   const [jobTags, setJobTags] = useState([]);
@@ -39,6 +42,11 @@ const JobApplicationForm = () => {
   const [isShowDeleteModal, setIsShowDeleteModal] = useState(false);
   const params = useLocalSearchParams();
   const { showToast } = useToast();
+
+  const { profile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
 
   const handleCVView = (cvFile) => {
     setSelectedPreviewFile(cvFile);
@@ -60,10 +68,10 @@ const JobApplicationForm = () => {
 
       await addListItemService(lists.JobApplications, {
         JobId: params.JobId,
-        UserId: currentUser.Id,
+        UserId: currentCandidate.Id,
         Description: description,
         CVId: selectedCV.Id,
-        Status: "Pending",
+        Status: JOBAPPLICATIONSTATUS.Pending,
       });
       showToast({
         message: "Job application submitted successfully",
@@ -102,7 +110,7 @@ const JobApplicationForm = () => {
 
   const init = async (UserId, JobId) => {
     try {
-      const [storeRecords, locCurrentUser, jobApplicationForm] =
+      const [storeRecords, loccurrentCandidate, jobApplicationForm] =
         await Promise.all([
           getItemsService(lists.StoreRecords, {
             filter: `RefID eq ${UserId} and DataSource eq '${lists.Users.listName}'`,
@@ -116,14 +124,19 @@ const JobApplicationForm = () => {
             expand: "CV",
           }).then((res) => res.value[0]),
         ]);
-
-      setStoreRecords(storeRecords.value);
-      setCurrentUser(locCurrentUser);
+      let newStoreRecords = storeRecords.value;
+      if (currentUser?.userType === USERTYPES.Recruiter) {
+        newStoreRecords = storeRecords.value.filter(
+          (item) => item.Id === jobApplicationForm.CVId
+        );
+      }
+      setStoreRecords(newStoreRecords);
+      setCurrentCandidate(loccurrentCandidate);
       setJobTags([
-        locCurrentUser?.JobType?.Title,
-        locCurrentUser?.JobTitle?.Title,
-        locCurrentUser?.Experience?.Title,
-        locCurrentUser?.WorkingModel?.Title,
+        loccurrentCandidate?.JobType?.Title,
+        loccurrentCandidate?.JobTitle?.Title,
+        loccurrentCandidate?.Experience?.Title,
+        loccurrentCandidate?.WorkingModel?.Title,
       ]);
       setJobApplicationForm(jobApplicationForm);
       setDescription(jobApplicationForm?.Description || "");
@@ -175,19 +188,19 @@ const JobApplicationForm = () => {
                 <View className="flex flex-row gap-2">
                   <FontAwesome name="user" size={20} />
                   <Text className="text-gray-400 ">
-                    {currentUser?.FullName}
+                    {currentCandidate?.FullName}
                   </Text>
                 </View>
                 <View className="flex flex-row gap-2">
                   <FontAwesome name="phone" size={20} />
                   <Text className="text-gray-400">
-                    {currentUser?.Phone || "N/A"}
+                    {currentCandidate?.Phone || "N/A"}
                   </Text>
                 </View>
                 <View className="flex flex-row gap-2">
                   <FontAwesome name="map-marker" size={20} />
                   <Text className="text-gray-400 ">
-                    {currentUser?.Location || "N/A"}
+                    {currentCandidate?.Location || "N/A"}
                   </Text>
                 </View>
               </View>
@@ -271,7 +284,8 @@ const JobApplicationForm = () => {
               </View>
             </View>
           </View>
-          {!jobApplicationForm?.Id ? (
+          {currentUser?.userType ===
+          USERTYPES.Recruiter ? null : !jobApplicationForm?.Id ? (
             <TouchableOpacity
               onPress={handleSubmit}
               className="bg-primary py-3 rounded-lg items-center my-2"

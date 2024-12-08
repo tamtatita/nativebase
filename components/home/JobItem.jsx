@@ -13,6 +13,7 @@ import { addListItemService, deleteListItemService } from "@/utils/services";
 
 import NoImage from "../../assets/images/no-image.png";
 import PropTypes from "prop-types";
+import { JOBAPPLICATIONSTATUS } from "@/constants";
 
 const propTypes = {
   data: PropTypes.object,
@@ -32,19 +33,19 @@ const JobItem = ({ data, type }) => {
     let color;
     let bg;
     switch (data?.status) {
-      case "sent":
+      case JOBAPPLICATIONSTATUS.Sent:
         bg = "#e0e7ff";
         color = "#4f46e5";
         break;
-      case "accepted":
+      case JOBAPPLICATIONSTATUS.Accepted:
         bg = "#d1fae5";
         color = "#059669";
         break;
-      case "rejected":
+      case JOBAPPLICATIONSTATUS.Rejected:
         bg = "#fee2e2";
         color = "#dc2626";
         break;
-      case "pending":
+      case JOBAPPLICATIONSTATUS.Pending:
         bg = "#ffedd5";
         color = "#f97316";
         break;
@@ -167,11 +168,6 @@ const JobItem = ({ data, type }) => {
             {item}
           </Text>
         ))}
-        {data?.type.length > 3 && (
-          <Text className="bg-slate-100 text-slate-700 p-2 font-semibold rounded-lg">
-            +{data?.type.length - 3}
-          </Text>
-        )}
       </View>
 
       {type !== "applied" && (

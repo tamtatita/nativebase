@@ -36,17 +36,17 @@ const Profile = () => {
 
   const dataList = [
     {
-      title: "Thông tin cá nhân",
+      title: "Personal Information",
       icon: <Feather name="user" size={30} color={Colors.primary} />,
       link: "/(auth)/applicantprofile",
     },
     {
-      title: "Các đơn đã ứng tuyển",
+      title: "Job Applied",
       icon: <Feather name="book-open" size={30} color={Colors.primary} />,
-      link: "jobApplied",
+      link: "/(auth)/jobApplied",
     },
     {
-      title: "Đăng xuất",
+      title: "Logout",
       icon: <Feather name="log-out" size={30} color={Colors.primary} />,
       onClick: async () => {
         await logout();

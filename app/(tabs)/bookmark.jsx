@@ -102,47 +102,48 @@ export default function BookMark() {
 
   return (
     <SafeAreaView className="flex-1 flex flex-col  bg-gray-100">
-      <View className="px-4 py-2 ">
+      <View className="px-4 py-2 flex flex-col ">
         <View className="flex-row items-center justify-center mb-4">
           <Text className="text-xl font-bold">Bookmarks</Text>
         </View>
-        <Searchbar
-          placeholder="Search jobs"
-          onChangeText={onChangeSearch}
-          defaultValue={searchQuery}
-          className="mb-4"
-        />
-        <View className=" mb-2 ">
-          <FlashList
-            data={criterias}
-            extraData={selectedCriteria}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={async () => {
-                  setSelectedCriteria(item);
-                  await handletGetBookmarks(item);
-                }}
-                className={`mr-2 px-4 py-2 rounded-full ${
-                  selectedCriteria?.Id === item?.Id
-                    ? "bg-blue-600"
-                    : "bg-gray-200"
-                }`}
-              >
-                <Text
-                  className={`${
-                    selectedCriteria?.Id === item?.Id
-                      ? "text-white"
-                      : "text-gray-800"
-                  } font-semibold`}
-                >
-                  {item?.Title} {/* Đảm bảo item nằm trong component <Text> */}
-                </Text>
-              </TouchableOpacity>
-            )}
-            horizontal
-            estimatedItemSize={20}
+        <View>
+          <Searchbar
+            placeholder="Search jobs"
+            onChangeText={onChangeSearch}
+            defaultValue={searchQuery}
+            className="mb-4"
           />
         </View>
+        <FlashList
+          data={criterias}
+          extraData={selectedCriteria}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={async () => {
+                setSelectedCriteria(item);
+                await handletGetBookmarks(item);
+              }}
+              className={`mr-2 px-4 py-2 rounded-full  ${
+                selectedCriteria?.Id === item?.Id
+                  ? "bg-blue-600"
+                  : "bg-gray-200"
+              }`}
+            >
+              <Text
+                className={`${
+                  selectedCriteria?.Id === item?.Id
+                    ? "text-white"
+                    : "text-gray-800"
+                } font-semibold`}
+              >
+                {item?.Title} {/* Đảm bảo item nằm trong component <Text> */}
+              </Text>
+            </TouchableOpacity>
+          )}
+          horizontal
+          estimatedItemSize={1}
+          contentContainerStyle={{ paddingVertical: 10 }}
+        />
       </View>
 
       <View className="flex-1 px-4 min-h-[2px]">

@@ -46,7 +46,7 @@ function RecentJobs() {
   const handleGetRecentJobs = useCallback(
     async (selectedCriteria) => {
       try {
-        let filter = "";
+        let filter = ``;
         if (selectedCriteria?.Id !== -1) {
           filter = `JobTitleId eq ${selectedCriteria?.Id} `;
         }
