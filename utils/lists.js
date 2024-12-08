@@ -37,9 +37,9 @@ const lists = {
     site: config.EHS_GEMBA_SITE,
     listName: "Criterias",
   },
-  Jobs: {
+  JobApplications: {
     site: config.EHS_GEMBA_SITE,
-    listName: "Jobs",
+    listName: "JobApplications",
   },
   Bookmarks: {
     site: config.EHS_GEMBA_SITE,

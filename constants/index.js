@@ -67,3 +67,10 @@ export class SendEmailItem {
     this.DataSource = DataSource;
   }
 }
+
+export const JOBAPPLICATIONSTATUS = {
+  Sent: "Sent",
+  Accepted: "Accepted",
+  Rejected: "Rejected",
+  Pending: "Pending",
+};

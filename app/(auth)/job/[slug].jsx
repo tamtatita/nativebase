@@ -322,7 +322,9 @@ const JobDetail = () => {
         }}
       >
         <Button
-          onPress={() => router.push("/(auth)/jobapplicationform/1")}
+          onPress={() =>
+            router.push("/(auth)/jobapplicationform/?UserId=1004&&JobId=1")
+          }
           type="full"
           title="Apply for Job"
         />

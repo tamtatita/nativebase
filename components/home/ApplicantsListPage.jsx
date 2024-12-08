@@ -10,7 +10,9 @@ import MaleImage from "@/assets/images/male-avatar.png";
 const PersonItem = ({ item }) => (
   <TouchableOpacity
     className="flex-row items-center px-4 py-2 bg-slate-50 mb-2"
-    onPress={() => router.push("/(auth)/jobapplicationform/1")}
+    onPress={() =>
+      router.push("/(auth)/jobapplicationform/?UserId=1004&&JobId=1")
+    }
   >
     <Image
       source={{ uri: item.avatar }}
