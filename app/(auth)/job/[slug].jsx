@@ -18,7 +18,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { formatCurrencyRange } from "@/utils";
 import { AboutPage, CompanyPage, ReviewPage } from "@/components";
 import { height } from "@/lib/InfoDevice";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import ApplicantsListPage from "../../../components/home/ApplicantsListPage";
 
 const mockPeople = [
@@ -63,7 +63,6 @@ const mockPeople = [
 const JobDetail = () => {
   const [clickTab, setClickTab] = useState("About");
   const tabs = ["About", "Company", "Applicants"];
-
   const handleChangeTab = (type) => {
     setClickTab(type);
   };
