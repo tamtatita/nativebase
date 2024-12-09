@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { MODULE_AUTH } from "@/store/auth";
 import { useAuth } from "../providers/AuthProvider";
 import { GENDERS } from "@/constants";
+import { router } from "expo-router";
 const propTypes = {
   data: PropTypes.object,
 };
@@ -22,6 +23,8 @@ const ChatItem = ({ data }) => {
     [currentUser, data]
   );
 
+  console.log("data", data);
+
   const imageSrc = useMemo(() => {
     if (data?.Sender?.ImageUrl) {
       return { uri: data?.Sender?.ImageUrl };
@@ -35,7 +38,7 @@ const ChatItem = ({ data }) => {
         <Text className="text-sm text-gray-500">
           {data?.Recruiter?.FullName} has accepted the job application.
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push(`/job/${data.JobId}`)}>
           <Text className="text-primary">View detail</Text>
         </TouchableOpacity>
       </View>

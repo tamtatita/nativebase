@@ -27,6 +27,7 @@ const JobDetail = () => {
   const dispatch = useDispatch();
   useFocusEffect(
     useCallback(() => {
+      if (!slug) return;
       dispatch(handleGetJobDetail({ Id: slug }));
     }, [slug, dispatch])
   );
