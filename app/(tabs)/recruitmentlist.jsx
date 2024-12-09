@@ -1,56 +1,70 @@
-import React, { useState } from "react";
-import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Searchbar } from "react-native-paper";
 import { IconButton } from "@/components/ui";
 import { JobItem } from "@/components";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { router } from "expo-router";
-
+import { router, useFocusEffect } from "expo-router";
+import { getItemsService } from "../../utils/services";
+import lists from "../../utils/lists";
+import { useAuth } from "../../components/providers/AuthProvider";
 const jobCategories = ["All", "Accountant", "BDM", "Content"];
 
-const mockJobs = [
-  {
-    id: "1",
-    title: "React Developer",
-    company: "AmplifyAvenue",
-    image_company: "https://example.com/amplifyavenue-logo.png",
-    location: "Remote",
-    type: ["Full-Time", "Remote", "Mid-Senior Level"],
-    salary: [62000, 82000],
-    applicantsView: 52,
-    status: "pending",
-  },
-  {
-    id: "6",
-    title: "Accountant",
-    company: "QubitLink Software",
-    image_company: "https://example.com/qubitlink-logo.png",
-    location: "New York, NY",
-    type: ["Contract", "On-Site", "Associate"],
-    salary: [42000, 42000],
-    applicantsView: 52,
-    status: "sent",
-  },
-  {
-    id: "3",
-    title: "React Native Developer",
-    company: "YellowByte Innovations",
-    image_company: "https://example.com/yellowbyte-logo.png",
-    location: "San Francisco, CA",
-    type: ["Contract", "On-Site", "Associate"],
-    salary: [70000, 70000],
-    applicantsView: 52,
-    status: "accepted",
-  },
-  // Add more mock jobs as needed
-];
+const convertDataToJobItem = (data) => {
+  return {
+    id: data?.Id,
+    title: data?.JobTitle?.Title,
+    image_company: data?.Recruiter?.ImageUrl,
+    location: data?.Recruiter?.CompanyLocation || "N/A",
+    salary: [data?.MinSalary, data?.MaxSalary],
+    deadline: data?.Deadline,
+    isActive: data?.IsActive,
+    type: [
+      data?.JobType?.Title,
+      data?.Experience?.Title,
+      data?.WorkingModel?.Title,
+    ],
+    applicantsView: data["JobApplications@odata.count"],
+    company: data?.Recruiter?.FullName,
+    ...data,
+  };
+};
 
 export default function RecruitmentList() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const [dataJobs, setDataJobs] = useState([]);
+  const { profile } = useAuth();
+  const currentUser = useMemo(() => {
+    return profile?.user;
+  }, [profile]);
 
   const onChangeSearch = (query) => setSearchQuery(query);
+
+  const handleGetJobsForRecruiter = async () => {
+    const response = await getItemsService(lists.Jobs, {
+      // filter,
+      expand: `WorkingModel,JobType,Experience,JobTitle,Recruiter`,
+      orderBy: "Created desc",
+      // top: 1,
+    });
+    setDataJobs(response?.value);
+  };
+
+  useEffect(() => {
+    handleGetJobsForRecruiter();
+  }, [loading]);
+
+  console.log(loading, "loading");
+  console.log(dataJobs, "dataJobs");
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
@@ -97,13 +111,24 @@ export default function RecruitmentList() {
           )}
           horizontal
           estimatedItemSize={20}
-          contentContainerStyle={{ paddingHorizontal: 4 }} // Only padding here
+          contentContainerStyle={{ paddingHorizontal: 4 }}
         />
       </View>
       <View className="flex-1 pt-4  ">
         <FlashList
-          data={mockJobs}
-          renderItem={({ item }) => <JobItem data={item} type="large" />}
+          data={dataJobs}
+          renderItem={({ item }) => {
+            const job = convertDataToJobItem(item);
+            return (
+              <JobItem
+                loading={loading}
+                setLoading={setLoading}
+                data={job}
+                type="large"
+                isHR={true}
+              />
+            );
+          }}
           estimatedItemSize={20}
           contentContainerStyle={{ paddingHorizontal: 20 }}
         />

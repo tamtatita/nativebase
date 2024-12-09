@@ -1,27 +1,42 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { width } from "@/lib/InfoDevice";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Colors } from "@/constants/Colors";
 import { IconButton } from "../ui";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { formatCurrencyRange } from "@/utils";
 import { router } from "expo-router";
 import { useAuth } from "../providers/AuthProvider";
 import lists from "@/utils/lists";
-import { addListItemService, deleteListItemService } from "@/utils/services";
+import {
+  addListItemService,
+  deleteListItemService,
+  updateListItemService,
+} from "@/utils/services";
 
 import NoImage from "../../assets/images/no-image.png";
 import PropTypes from "prop-types";
 import { JOBAPPLICATIONSTATUS } from "@/constants";
+import { formatCurrencyRange } from "@/utils";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Entypo from "@expo/vector-icons/Entypo";
 
 const propTypes = {
   data: PropTypes.object,
   type: PropTypes.string,
+  isHR: PropTypes.bool,
+  loading: PropTypes.bool,
+  setLoading: PropTypes.func,
 };
 
-const JobItem = ({ data, type }) => {
-  const [loading, setLoading] = useState(false);
+const JobItem = ({ data, type, isHR, loading, setLoading }) => {
   const [currentBookmark, setCurrentBookmark] = useState(data?.bookmark);
 
   const { profile } = useAuth();
@@ -67,7 +82,6 @@ const JobItem = ({ data, type }) => {
   }, [data]);
 
   const handleOnPressBookmark = useCallback(async () => {
-    setLoading(true);
     try {
       if (currentBookmark?.Id) {
         await deleteListItemService(lists.Bookmarks, currentBookmark.Id);
@@ -90,6 +104,89 @@ const JobItem = ({ data, type }) => {
     }
   }, [currentBookmark, currentUser, data]);
 
+  const checkStatus = useMemo(() => {
+    if (data?.isActive === false) return false;
+    const currentDate = new Date();
+    const expiredDate = new Date(data?.deadline);
+    return currentDate < expiredDate;
+  }, [data]);
+
+  // eslint-disable-next-line no-undef
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const popConfirmCloseJob = (id, name, isActive) => {
+    const action = isActive ? "Close" : "Open";
+    const message = `Are you sure you want to ${action.toLowerCase()} job ${name}?`;
+
+    Alert.alert(`${action} job`, message, [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Yes", onPress: () => CallCloseJob(id, isActive) },
+    ]);
+  };
+
+  const popConfirmDeleteJob = (id, name) => {
+    Alert.alert("Delete job", `Are you sure you want to delete job ${name}`, [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Yes", onPress: () => CallDeleteJob(id) },
+    ]);
+  };
+
+  const handleEditJob = (id) => {
+    router.push({
+      pathname: "/(auth)/jobpostform/[postId]",
+      params: { id },
+    });
+  };
+
+  const CallCloseJob = async (id, isActive) => {
+    try {
+      await delay(1000);
+
+      // Cập nhật trạng thái công việc
+      const response = await updateListItemService(lists.Jobs, id, {
+        IsActive: !isActive,
+      });
+
+      Alert.alert(
+        `${!isActive ? "Open" : "Close"} job`,
+        `Job ${response?.Title} has been ${
+          !isActive ? "opened" : "closed"
+        } successfully`
+      );
+
+      setLoading((prev) => !prev); // Đảo trạng thái loading
+    } catch (error) {
+      console.error("Error closing job:", error);
+
+      Alert.alert(
+        `${!isActive ? "Open" : "Close"} job`,
+        `An error occurred while trying to ${
+          !isActive ? "open" : "close"
+        } the job.`
+      );
+    }
+  };
+
+  const CallDeleteJob = async (id) => {
+    try {
+      await delay(1000);
+      await deleteListItemService(lists.Jobs, id);
+      Alert.alert("Delete job", `Job has been deleted`);
+      setLoading(!loading);
+    } catch (error) {
+      console.log("error", error);
+      Alert.alert("Delete job", `Error when deleting job`);
+    }
+  };
+
   return (
     <View
       style={{
@@ -104,7 +201,7 @@ const JobItem = ({ data, type }) => {
         marginBottom: type === "small" ? 0 : 15,
       }}
     >
-      <TouchableOpacity onPress={() => router.push(`/job/${data?.id}`)}>
+      <TouchableOpacity onPress={() => router.push(`/job/${data?.id}?type=hr`)}>
         {/* Header (Ảnh và nút lưu) */}
         <View className="flex flex-row items-center justify-between">
           <View className="flex flex-row items-center gap-2">
@@ -123,7 +220,7 @@ const JobItem = ({ data, type }) => {
               </Text>
             </View>
           </View>
-          {type !== "applied" ? (
+          {!isHR && type !== "applied" ? (
             <View>
               <IconButton
                 size={"small"}
@@ -169,6 +266,56 @@ const JobItem = ({ data, type }) => {
           </Text>
         ))}
       </View>
+      {/* Trạng thái bài đăng */}
+      <View
+        style={{ width: 80 }}
+        className={`px-4 py-2 my-1 rounded-md ${
+          checkStatus ? "bg-green-500" : "bg-red-500"
+        }`}
+      >
+        <Text className={`text-white font-semibold text-[13px]`}>
+          {checkStatus ? "Active" : "Expired "}
+        </Text>
+      </View>
+
+      {isHR && (
+        <View className="flex justify-end items-end flex-row ">
+          <IconButton
+            onPress={() => handleEditJob(data?.id)}
+            color={"#fbbf24"}
+            classNames={" bg-red-100 rounded-md mr-4"}
+            shape={"roundedSquare"}
+            size={"small"}
+            icon={<AntDesign name="edit" size={20} color="white" />}
+          />
+
+          <IconButton
+            onPress={() =>
+              popConfirmCloseJob(data?.id, data?.title, data?.isActive)
+            }
+            color={data?.isActive ? "#8b5cf6" : "gray"}
+            classNames={" bg-red-600 rounded-md mr-4"}
+            shape={"roundedSquare"}
+            size={"small"}
+            icon={
+              <Entypo
+                name={data?.isActive ? "lock-open" : "lock"}
+                size={20}
+                color="white"
+              />
+            }
+          />
+
+          <IconButton
+            onPress={() => popConfirmDeleteJob(data?.id, data?.title)}
+            color={"#f43f5e"}
+            classNames={" bg-red-600 rounded-md"}
+            shape={"roundedSquare"}
+            size={"small"}
+            icon={<AntDesign name="delete" size={20} color="white" />}
+          />
+        </View>
+      )}
 
       {type !== "applied" && (
         <>
@@ -177,29 +324,6 @@ const JobItem = ({ data, type }) => {
           {/* Applicants view và mức lương */}
           <View className="flex flex-row items-center justify-between">
             <View>
-              {/* <View className="flex flex-row -space-x-1 overflow-hidden">
-                <Image
-                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-                  src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
-                <Image
-                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-                  src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
-                <Image
-                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
-                  alt=""
-                />
-                <Image
-                  className="inline-block h-6 w-6 rounded-full ring-2 ring-white"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
-              </View> */}
-
               <Text className="text-slate-500 font-semibold mt-2">
                 {data?.applicantsView > 0
                   ? `${data.applicantsView} Applicants`

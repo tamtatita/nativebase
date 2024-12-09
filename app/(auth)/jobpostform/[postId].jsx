@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -26,7 +26,7 @@ import {
 import lists from "../../../utils/lists";
 import { useAuth } from "../../../components/providers/AuthProvider";
 import { CRITERIATYPES } from "../../../constants";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 
 const OPTION_GENDER = [
   { label: "Male", value: "male" },
@@ -34,12 +34,14 @@ const OPTION_GENDER = [
   { label: "Any", value: "any" },
 ];
 export default function JobPostForm() {
+  const { postId } = useLocalSearchParams();
   const [workingModels, setWorkingModels] = useState([]);
   const [jobTypes, setJobTypes] = useState([]);
   const [experienceLevels, setExperienceLevels] = useState([]);
   const [jobTitles, setJobTitles] = useState([]);
 
   const [showPicker, setShowPicker] = useState(false);
+  const [dataJobDetail, setDataJobDetail] = useState([]);
 
   const init = useCallback(async () => {
     const criteriasResp = await getItemsService(lists.Criterias).then(
@@ -72,6 +74,28 @@ export default function JobPostForm() {
       init();
     }, [])
   );
+
+  const getDataJob = async () => {
+    try {
+      await getItemsService(lists.Jobs, postId)
+        .then((res) => {
+          setDataJobDetail(res?.value);
+        })
+        .catch((error) => {
+          console.log(error, "error");
+        });
+    } catch {
+      Alert.alert("Warning", "An error occurred, please try again later!");
+    }
+  };
+
+  console.log(dataJobDetail, "dataJobDetail");
+
+  useEffect(() => {
+    if (postId) {
+      getDataJob();
+    }
+  }, [postId]);
 
   const { profile, setProfile } = useAuth();
   const currentUser = useMemo(() => {
@@ -171,19 +195,19 @@ export default function JobPostForm() {
           <IconButton type="back" size="small" />
           <Formik
             initialValues={{
-              MinSalary: "",
-              MaxSalary: "",
-              Description: "",
-              Requirement: "",
-              JobTypeId: "",
-              ExperienceId: "",
-              JobTitleId: "",
-              WorkingModelId: "",
-              Title: "",
-              Quantity: 2,
-              Interest: "",
-              WorkingHours: "",
-              Deadline: new Date(),
+              MinSalary: dataJobDetail?.MinSalary || "",
+              MaxSalary: dataJobDetail?.MaxSalary || "",
+              Description: dataJobDetail?.Description || "",
+              Requirement: dataJobDetail?.Requirement || "",
+              JobTypeId: dataJobDetail?.JobTypeId || "",
+              ExperienceId: dataJobDetail?.ExperienceId || "",
+              JobTitleId: dataJobDetail?.JobTitleId || "",
+              WorkingModelId: dataJobDetail?.WorkingModelId || "",
+              Title: dataJobDetail?.Title || "",
+              Quantity: dataJobDetail?.Quantity || "",
+              Interest: dataJobDetail?.Interest || "",
+              WorkingHours: dataJobDetail?.WorkingHours || "",
+              Deadline: dataJobDetail?.Deadline || new Date(),
             }}
             onSubmit={handleSubmit}
             validationSchema={validationSchema}
