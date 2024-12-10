@@ -5,9 +5,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   SafeAreaView,
-  ActivityIndicator,
 } from "react-native";
 import { IconButton } from "../../../components/ui";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -124,6 +122,16 @@ const JobApplicationForm = () => {
       type: "loading",
     });
     try {
+      if (currentCandidate.Email) {
+        sendEmailService({
+          ToEmails: currentCandidate.Email,
+          Subject: "Job acceptance notification",
+          Body: `Congratulations.Your job application for the position of ${jobApplicationForm?.Jobs?.JobTitle?.Title} has been accepted by recruiter ${currentUser.fullName}. Please check on the app for more details.`,
+          IsTest: false,
+          RefId: jobApplicationForm?.Id?.toString(),
+          DataSource: lists.JobApplications.listName,
+        });
+      }
       let [messageBox, newMessage] = await Promise.all([
         getItemsService(lists.MessageBox, {
           filter: `RecruiterId eq ${currentUser.id} and CandidateId eq ${currentCandidate.Id}`,
@@ -140,15 +148,6 @@ const JobApplicationForm = () => {
         updateListItemService(lists.JobApplications, jobApplicationForm.Id, {
           Status: JOBAPPLICATIONSTATUS.Accepted,
         }),
-        currentCandidate.Email &&
-          sendEmailService({
-            ToEmails: currentCandidate.Email,
-            Subject: "Job acceptance notification",
-            Body: `Your job application for the position of ${jobApplicationForm?.Jobs?.JobTitle?.Title} has been accepted by recruiter ${currentUser.fullName}. Please check on the app for more details.`,
-            IsTest: false,
-            RefId: jobApplicationForm?.Id?.toString(),
-            DataSource: lists.JobApplications.listName,
-          }),
       ]);
 
       if (!messageBox) {
@@ -187,6 +186,49 @@ const JobApplicationForm = () => {
     }
   };
 
+  const handleRejectJob = async () => {
+    setLoading(true);
+    showToast({
+      message: "Reject job application...",
+      type: "loading",
+    });
+    try {
+      if (currentCandidate.Email) {
+        sendEmailService({
+          ToEmails: currentCandidate.Email,
+          Subject: "Job Application Rejected",
+          Body: `We regret to inform you that your job application for the position of ${jobApplicationForm?.Jobs?.JobTitle?.Title} has been rejected by recruiter ${currentUser.fullName}. Please check on the app for more details.`,
+          IsTest: false,
+          RefId: jobApplicationForm?.Id?.toString(),
+          DataSource: lists.JobApplications.listName,
+        });
+      }
+      await updateListItemService(
+        lists.JobApplications,
+        jobApplicationForm.Id,
+        {
+          Status: JOBAPPLICATIONSTATUS.Rejected,
+        }
+      );
+
+      showToast({
+        message: "Job application rejected successfully",
+        type: "success",
+        timeClose: 3000,
+      });
+      router.back();
+    } catch (error) {
+      console.log("Error reject job application", error);
+      showToast({
+        message: "Error occurred",
+        type: "error",
+        timeClose: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const init = async (UserId, JobId) => {
     setLoading(true);
     showToast({
@@ -201,7 +243,7 @@ const JobApplicationForm = () => {
       const [storeRecords, loccurrentCandidate, jobApplicationForm] =
         await Promise.all([
           getItemsService(lists.StoreRecords, {
-            filter: `RefID eq ${UserId} and DataSource eq '${lists.Users.listName}'`,
+            filter: `RefID eq ${UserId} and DataSource eq '${lists.Users.listName}' and contains(ServerRelativeUrl, '/DocumentStore') and IsFolder eq false`,
           }),
           getItemsService(lists.Users, {
             filter: `Id eq ${UserId}`,
@@ -356,8 +398,8 @@ const JobApplicationForm = () => {
                         placeholder="Tell us about yourself"
                         multiline
                         rows={4}
-                        value={description}
-                        onChangeText={setDescription}
+                        defaultValue={description}
+                        onEndEditing={(e) => setDescription(e.nativeEvent.text)}
                       />
 
                       {/* Chọn CV */}
@@ -411,55 +453,66 @@ const JobApplicationForm = () => {
             }}
           />
         </View>
-        <View className="flex flex-row gap-2  bg-white p-2">
-          {currentUser?.userType ===
-          USERTYPES.Recruiter ? null : !jobApplicationForm?.Id ? (
+        {currentUser?.userType === USERTYPES.Recruiter ||
+        jobApplicationForm?.Status !== JOBAPPLICATIONSTATUS.Pending ? null : (
+          <View className="flex flex-row gap-2  bg-white p-2">
+            {!jobApplicationForm?.Id ? (
+              <TouchableOpacity
+                onPress={handleSubmit}
+                disabled={loading}
+                className={`bg-primary py-3 rounded-lg items-center my-2 flex-1 flex flex-row justify-center ${
+                  loading ? "opacity-50" : null
+                }`}
+              >
+                <FontAwesome name="send" color="white" size={20} />
+                <Text className="text-white font-bold text-lg ml-2">
+                  Apply Job
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                disabled={loading}
+                className={`bg-red-600 py-3 rounded-lg items-center my-2 flex-1 flex flex-row justify-center ${
+                  loading ? "opacity-50" : null
+                }`}
+                onPress={() => setIsShowDeleteModal(true)}
+              >
+                <Ionicons name="close-outline" size={24} color="white" />
+                <Text className="text-white font-bold text-lg ml-2">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        {currentUser?.id === jobApplicationForm?.Jobs?.RecruiterId &&
+        jobApplicationForm?.Status === JOBAPPLICATIONSTATUS.Pending ? (
+          <View className="flex flex-row gap-2  bg-white p-2">
             <TouchableOpacity
-              onPress={handleSubmit}
               disabled={loading}
-              className={`bg-primary py-3 rounded-lg items-center my-2 flex-1 flex flex-row justify-center ${
-                loading ? "opacity-50" : null
-              }`}
+              className={`flex-1 flex flex-row justify-center rounded-lg items-center py-2 my-2 bg-red-600 ${
+                loading ? "opacity-50" : ""
+              } `}
+              onPress={() => handleRejectJob()}
             >
-              <FontAwesome name="send" color="white" size={20} />
+              <Ionicons name="close-circle-outline" size={24} color="white" />
               <Text className="text-white font-bold text-lg ml-2">
-                Apply Job
+                Rejected
               </Text>
             </TouchableOpacity>
-          ) : (
             <TouchableOpacity
               disabled={loading}
-              className={`bg-red-600 py-3 rounded-lg items-center my-2 flex-1 flex flex-row justify-center ${
-                loading ? "opacity-50" : null
-              }`}
-              onPress={() => setIsShowDeleteModal(true)}
+              className={`flex-1 flex flex-row justify-center rounded-lg items-center py-2 my-2 bg-green-600 ${
+                loading ? "opacity-50" : ""
+              } `}
+              onPress={() => handleAccpectJob()}
             >
-              <Ionicons name="close-outline" size={24} color="white" />
-              <Text className="text-white font-bold text-lg ml-2">Cancel</Text>
+              <Ionicons name="checkmark" size={24} color="white" />
+              <Text className="text-white font-bold text-lg ml-2">Accpect</Text>
             </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            disabled={loading}
-            className={`flex-1 flex flex-row justify-center rounded-lg items-center py-2 my-2 bg-red-600 ${
-              loading ? "opacity-50" : ""
-            } `}
-            onPress={() => setIsShowDeleteModal(true)}
-          >
-            <Ionicons name="close-circle-outline" size={24} color="white" />
-            <Text className="text-white font-bold text-lg ml-2">Rejected</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            disabled={loading}
-            className={`flex-1 flex flex-row justify-center rounded-lg items-center py-2 my-2 bg-green-600 ${
-              loading ? "opacity-50" : ""
-            } `}
-            onPress={() => handleAccpectJob()}
-          >
-            <Ionicons name="checkmark" size={24} color="white" />
-            <Text className="text-white font-bold text-lg ml-2">Accpect</Text>
-          </TouchableOpacity>
-        </View>
+          </View>
+        ) : null}
       </SafeAreaView>
       {
         // Xem trước file PDF

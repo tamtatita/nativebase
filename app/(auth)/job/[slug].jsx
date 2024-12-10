@@ -1,7 +1,6 @@
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import React, { useCallback, useMemo } from "react";
 import { FlashList } from "@shopify/flash-list";
-import { Button } from "@/components/ui";
 
 import { AboutPage, CompanyPage } from "@/components";
 import { height } from "@/lib/InfoDevice";
@@ -13,6 +12,9 @@ import JobDetailTab from "../../../components/job/JobDetailTab";
 import { useDispatch, useSelector } from "react-redux";
 import { handleGetJobDetail, MODULE_JOBDETAIL } from "../../../store/jobdetail";
 import { useAuth } from "../../../components/providers/AuthProvider";
+import { TouchableOpacity } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import dayjs from "dayjs";
 
 const JobDetail = () => {
   const { selectedTab, jobDetail } = useSelector(
@@ -25,10 +27,26 @@ const JobDetail = () => {
 
   const { slug } = useLocalSearchParams();
   const dispatch = useDispatch();
+
+  const currentJobApplication = useMemo(() => {
+    return jobDetail?.JobApplications?.find(
+      (item) => item.UserId === currentUser?.id
+    );
+  }, [jobDetail, currentUser]);
+
+  const deadlineStatus = useMemo(() => {
+    const deadline = dayjs(jobDetail?.Deadline);
+    const now = dayjs();
+
+    if (deadline.isBefore(now) || !jobDetail?.Deadline) return "Expired";
+    if (deadline.diff(now, "day") <= 1) return "Urgent";
+    return "Normal";
+  }, [jobDetail]);
+
   useFocusEffect(
     useCallback(() => {
       if (!slug) return;
-      dispatch(handleGetJobDetail({ Id: slug }));
+      dispatch(handleGetJobDetail({ Id: slug, UserId: currentUser?.id }));
     }, [slug, dispatch])
   );
   return (
@@ -82,13 +100,28 @@ const JobDetail = () => {
             backgroundColor: "white",
           }}
         >
-          <Button
-            onPress={() =>
-              router.push("/(auth)/jobapplicationform/?UserId=1004&&JobId=1")
-            }
-            type="full"
-            title="Apply for Job"
-          />
+          <TouchableOpacity
+            onPress={() => {
+              router.push(
+                ` /(auth)/jobapplicationform/?UserId=${currentUser?.id}&&JobId=${slug}`
+              );
+            }}
+            // disabled={loading}
+            className={`bg-primary py-3 rounded-lg items-center my-2 flex-1 flex flex-row justify-center w-full ${
+              !currentJobApplication?.Id && deadlineStatus === "Expired"
+                ? "opacity-50"
+                : null
+            }`}
+          >
+            <FontAwesome
+              name={currentJobApplication?.Id ? "edit" : "send"}
+              color="white"
+              size={20}
+            />
+            <Text className="text-white font-bold text-lg ml-2">
+              {currentJobApplication?.Id ? "Update Application" : "Apply Now"}
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>

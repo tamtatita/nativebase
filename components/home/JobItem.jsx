@@ -204,15 +204,18 @@ const JobItem = ({ data, type, isHR, loading, setLoading }) => {
       <TouchableOpacity onPress={() => router.push(`/job/${data?.id}?type=hr`)}>
         {/* Header (Ảnh và nút lưu) */}
         <View className="flex flex-row items-center justify-between">
-          <View className="flex flex-row items-center gap-2">
+          <View className="flex flex-row items-center gap-2 flex-1">
             <Image
               source={
                 data?.image_company ? { uri: data?.image_company } : NoImage
               }
               style={{ width: 40, height: 40, borderRadius: 20 }}
             />
-            <View className="flex">
-              <Text className="font-bold text-lg text-slate-700">
+            <View className="flex flex-col flex-1 ">
+              <Text
+                className="font-bold text-lg text-slate-700 "
+                numberOfLines={2}
+              >
                 {data?.title}
               </Text>
               <Text className="font-medium text-[14px] text-slate-700">
@@ -273,7 +276,7 @@ const JobItem = ({ data, type, isHR, loading, setLoading }) => {
           checkStatus ? "bg-green-500" : "bg-red-500"
         }`}
       >
-        <Text className={`text-white font-semibold text-[13px]`}>
+        <Text className={`text-white font-semibold text-[13px] text-center`}>
           {checkStatus ? "Active" : "Expired "}
         </Text>
       </View>

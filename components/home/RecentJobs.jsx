@@ -11,11 +11,12 @@ import { FlashList } from "@shopify/flash-list";
 export const convertDataToJobItem = (data) => {
   return {
     id: data?.Id,
-    title: data?.JobTitle?.Title,
+    title: data?.Title,
     image_company: data?.Recruiter?.ImageUrl,
-    location: data?.Locations || "N/A",
+    location: data?.Recruiter.CompanyAddress || "N/A",
     salary: [data?.MinSalary, data?.MaxSalary],
     type: [
+      data?.JobTitle?.Title,
       data?.JobType?.Title,
       data?.Experience?.Title,
       data?.WorkingModel?.Title,
@@ -23,6 +24,8 @@ export const convertDataToJobItem = (data) => {
     applicantsView: data["JobApplications@odata.count"],
     company: data?.Recruiter?.FullName,
     bookmark: data.Bookmarks[0],
+    deadline: data?.Deadline,
+    isActive: data?.IsActive,
     ...data,
   };
 };

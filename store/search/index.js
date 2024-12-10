@@ -76,7 +76,7 @@ export const handleFilter = createAsyncThunk(
       const conditions = [];
       if (searchText) {
         conditions.push(
-          `(contains(Locations, '${searchText}') or contains(Recruiter/FullName, '${searchText}'))`
+          `(contains(Recruiter/CompanyAddress, '${searchText}') or contains(Recruiter/FullName, '${searchText}') or contains(Title, '${searchText}') )`
         );
       }
       if (selectedWorkingModel?.Id) {

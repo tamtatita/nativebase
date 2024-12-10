@@ -48,7 +48,7 @@ const ImageUploader = ({
       const item = itemResponse.value[0];
       setItem(item);
     } catch (error) {
-      notiError("Không thể tải ảnh từ server!");
+      // notiError("Không thể tải ảnh từ server!");
     } finally {
       setLoadingState("");
     }

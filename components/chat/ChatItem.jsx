@@ -23,8 +23,6 @@ const ChatItem = ({ data }) => {
     [currentUser, data]
   );
 
-  console.log("data", data);
-
   const imageSrc = useMemo(() => {
     if (data?.Sender?.ImageUrl) {
       return { uri: data?.Sender?.ImageUrl };

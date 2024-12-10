@@ -27,6 +27,7 @@ const convertDataToJobItem = (data) => {
     deadline: data?.Deadline,
     isActive: data?.IsActive,
     type: [
+      data?.JobTitle?.Title,
       data?.JobType?.Title,
       data?.Experience?.Title,
       data?.WorkingModel?.Title,
@@ -51,7 +52,7 @@ export default function RecruitmentList() {
 
   const handleGetJobsForRecruiter = async () => {
     const response = await getItemsService(lists.Jobs, {
-      // filter,
+      filter: `RecruiterId eq ${currentUser?.id} `,
       expand: `WorkingModel,JobType,Experience,JobTitle,Recruiter`,
       orderBy: "Created desc",
       // top: 1,
@@ -62,9 +63,6 @@ export default function RecruitmentList() {
   useEffect(() => {
     handleGetJobsForRecruiter();
   }, [loading]);
-
-  console.log(loading, "loading");
-  console.log(dataJobs, "dataJobs");
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
