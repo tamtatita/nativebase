@@ -10,11 +10,12 @@ import { useFocusEffect } from "expo-router";
 const convertAppliedToJob = (data) => {
   return {
     id: data?.JobId,
-    title: data?.Jobs?.JobTitle?.Title,
+    title: data?.Jobs?.Title,
     image_company: data?.Jobs?.Recruiter?.ImageUrl,
-    location: data?.Jobs?.Locations || "N/A",
+    location: data?.Jobs?.Recruiter.CompanyAddress || "N/A",
     salary: [data?.Jobs?.MinSalary, data?.Jobs?.MaxSalary],
     type: [
+      data?.Jobs?.JobTitle?.Title,
       data?.Jobs?.JobType?.Title,
       data?.Jobs?.Experience?.Title,
       data?.Jobs?.WorkingModel?.Title,
@@ -23,6 +24,8 @@ const convertAppliedToJob = (data) => {
     company: data?.Jobs?.Recruiter?.FullName,
     bookmark: {},
     status: data?.Status,
+    deadline: data?.Jobs?.Deadline,
+    isActive: data?.Jobs?.IsActive,
     ...data,
   };
 };

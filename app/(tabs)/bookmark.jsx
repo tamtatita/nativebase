@@ -15,11 +15,12 @@ const allSelected = { Id: -1, Title: "All" };
 const convertBookmarkToJob = (data) => {
   return {
     id: data?.JobId,
-    title: data?.Job?.JobTitle?.Title,
+    title: data?.Job?.Title,
     image_company: data?.Job?.Recruiter?.ImageUrl,
-    location: data?.Job?.Locations || "N/A",
+    location: data?.Job?.Recruiter.CompanyAddress || "N/A",
     salary: [data?.Job?.MinSalary, data?.Job?.MaxSalary],
     type: [
+      data?.Job?.JobTitle?.Title,
       data?.Job?.JobType?.Title,
       data?.Job?.Experience?.Title,
       data?.Job?.WorkingModel?.Title,
@@ -27,6 +28,8 @@ const convertBookmarkToJob = (data) => {
     applicantsView: data?.Job?.["JobApplications@odata.count"],
     company: data?.Job?.Recruiter?.FullName,
     bookmark: data,
+    deadline: data?.Job?.Deadline,
+    isActive: data?.Job?.IsActive,
     ...data,
   };
 };
@@ -56,7 +59,7 @@ export default function BookMark() {
 
         if (searchText) {
           conditions.push(
-            `(contains(Job/Locations, '${searchText}') or contains(Job/Recruiter/FullName, '${searchText}'))`
+            `(contains(Job/Locations, '${searchText}') or contains(Job/Recruiter/FullName, '${searchText}') or (contains(Job/Title, '${searchText}'))`
           );
         }
         conditions.push(`UserId eq ${currentUser?.id}`);

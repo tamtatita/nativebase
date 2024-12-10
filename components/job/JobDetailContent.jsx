@@ -59,7 +59,7 @@ function JobDetailContent() {
     const deadline = dayjs(jobDetail?.Deadline);
     const now = dayjs();
 
-    if (deadline.isBefore(now)) return "Expired";
+    if (deadline.isBefore(now) || !jobDetail?.Deadline) return "Expired";
     if (deadline.diff(now, "day") <= 1) return "Urgent";
     return "Normal";
   }, [jobDetail]);

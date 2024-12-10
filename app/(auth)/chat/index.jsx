@@ -190,7 +190,7 @@ const ChatDetail = () => {
         // style={{ height: height - 300 }}
         className="bg-white p-5 flex-1 flex flex-col rounded-tr-3xl rounded-tl-3xl"
       >
-        <FlashList
+        <FlatList
           inverted
           ref={flashListRef} // Tham chiếu đến FlashList
           scrollEnabled

@@ -6,6 +6,7 @@ import { useFocusEffect } from "expo-router";
 import lists from "@/utils/lists";
 import { getItemsService } from "@/utils/services";
 import { convertDataToJobItem } from "./RecentJobs";
+import dayjs from "dayjs";
 
 function SuggestedJob() {
   const [suggestedJobs, setSuggestedJobs] = useState([]);
@@ -24,7 +25,9 @@ function SuggestedJob() {
     if (currentUser?.workingModelId) {
       conditions.push(`WorkingModelId eq ${currentUser?.workingModelId}`);
     }
-    let filter = `(${conditions.join(" or ")})`;
+    let filter = ` (DeadLine ge ${dayjs().toISOString()}) and (${conditions.join(
+      " or "
+    )})`;
     if (currentUser?.jobTitleId) {
       filter += ` and (JobTitleId eq ${currentUser?.jobTitleId})`;
     }
