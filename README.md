@@ -1,3 +1,16 @@
+## THÀNH VIÊN
+1. Lê Văn Tâm - 3120560086
+2. Châu Quốc Thanh - 3120560089
+## TASKS
+- Tâm
+	- Set up getItemsList,updateItemList,addItemList with odata endpoint rules.
+	- Set up  layout (auth), (public), 
+	- Set up ORM -> Microsoft.EntityFrameworkCore, Microsoft.EntityFrameworkCore.SqlServer
+- Thanh
+	- Set up Generic Bulk Controller
+	- Lưu file -> File Controller, Firebase Storage Service
+	- Chat realtime services
+	- Authentication -> JWT
 # Install environment 
 1. Install NodeJS
 2. Install Visual Studio Code
