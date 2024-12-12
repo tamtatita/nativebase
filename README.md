@@ -1,3 +1,16 @@
+# Install environment 
+1. Install NodeJS
+2. Install Visual Studio Code
+# Install & start project
+1. npm install
+2. ipconfig lấy Ipv4 network
+3. Vào file .env đổi EXPO_PUBLIC_VITE_BASE_URL bằng địa chỉ tương ứng
+4. npm run dev
+# Git commands step
+**1.First config**
+  -   git config --global core.autocrlf true
+  -   git config --global user.name ""
+  -   git config --global user.email ""
 ## Git commands step
 
  1.  First config
