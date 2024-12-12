@@ -11,6 +11,24 @@
 	- Lưu file -> File Controller, Firebase Storage Service
 	- Chat realtime services
 	- Authentication -> JWT
+
+ 
+## Phân Chia Nhiệm Vụ 
+| **Task** | **Người Phụ Trách** | **Ghi Chú** | 
+|-------------------------------------|--------------------------|---------------------------------------|
+ | Thiết kế giao diện trang chủ | Châu Quốc Thanh | Gồm banner, danh sách công việc mới nhất. |
+  | Thiết kế giao diện trang chi tiết job | Lê Văn Tâm | Gồm mô tả công việc, yêu cầu, nút ứng tuyển. |
+   | Thiết kế giao diện đăng nhập | Châu Quốc Thanh | Bao gồm form login, liên kết đến đăng ký. | 
+   | Thiết kế giao diện đăng ký | Lê Văn Tâm | Bao gồm form đăng ký, xác nhận mật khẩu. | 
+   | Thiết kế giao diện bảng điều khiển HR | Châu Quốc Thanh | Gồm danh sách job đã đăng, nút thêm mới job. | 
+   | Thiết kế giao diện bảng applicant | Lê Văn Tâm | Gồm danh sách job đã ứng tuyển, trạng thái ứng tuyển. |
+   | Thiết kế giao diện tìm kiếm job | Châu Quốc Thanh | Bao gồm ô tìm kiếm và bộ lọc (ngành nghề, địa điểm). |
+   | Thiết kế giao diện chỉnh sửa thông tin profile | Lê Văn Tâm | Bao gồm form cập nhật thông tin cá nhân. |
+   | Thiết kế bản explore | Lê Văn Tâm | Bao gồm form cập nhật thông tin cá nhân. |
+   | Thiết kế phần Chat | Châu Quốc Thanh |Gồm danh sách cuộc trò chuyện.|
+   | Thiết kế bản Chat Detail | Châu Quốc Thanh |Gồm nội dung chi tiết của một cuộc trò chuyện.|
+   
+     
 # Install environment 
 1. Install NodeJS
 2. Install Visual Studio Code
